@@ -1,29 +1,37 @@
 import {
   KeyboardAvoidingView,
-  Pressable,
   SafeAreaView,
-  ScrollView,
   StyleSheet,
   TextInput,
   TouchableOpacity,
 } from "react-native";
 
+import Animation from "@/components/Animation";
 import { Text, View } from "@/components/Themed";
 import Colors from "@/constants/Colors";
+import { useDictionaryContext } from "@/context/DictionaryContext";
 import useTheme from "@/hooks/useTheme";
-import { TabBarIcon } from "./_layout";
 import { FlashList } from "@shopify/flash-list";
-import { useKeyboardVisible } from "@/hooks/useKeyboard";
-import { useEffect } from "react";
+import { router, useNavigation } from "expo-router";
+import { TabBarIcon } from "./_layout";
 
 interface IActionItem {
   iconName: any;
+  action?: any;
 }
 
 export default function SearchPage() {
   const theme = useTheme();
-  // const isKeyboard = useKeyboardVisible();
   const styles = getStyles(theme);
+  const navigation = useNavigation<any>();
+  const { historyWords, dailyWord, addOrRemoveFavorite } =
+    useDictionaryContext();
+  const notFoundSource = require("../../assets/lottie/history.json");
+  const defaultWord = {
+    id: 0,
+    topic: dailyWord as string,
+    created_at: "",
+  };
 
   const wordOfDayActions: IActionItem[] = [
     {
@@ -31,19 +39,11 @@ export default function SearchPage() {
     },
     {
       iconName: "heart-o",
+      action: () => addOrRemoveFavorite?.(defaultWord),
     },
     {
-      iconName: "copy",
+      iconName: "search",
     },
-  ];
-  const tredWords = ["Escuela", "Lapicero", "Libro"];
-  const historyWords = [
-    "Aguacate",
-    "Libro",
-    "Vegetales",
-    "Escuela",
-    "Lapicero",
-    "Libro",
   ];
 
   const renderItem = ({ item, index }: any) => {
@@ -56,76 +56,103 @@ export default function SearchPage() {
       </View>
     );
   };
-  const renderHistoryItem = ({ item, index }: any) => {
+  const renderHistoryItem = ({ item, index }: { item: any; index: number }) => {
     return (
-      <View
-        key={item + "-" + index}
+      <TouchableOpacity
+        activeOpacity={0.9}
+        key={item.id + "-" + index}
         style={[styles.listItem, styles.historyItem]}
+        onPress={() => goToDefinition(item.topic)}
       >
-        <Text style={[styles.listHistoryLabel]}>{item}</Text>
+        <Text style={[styles.listHistoryLabel]}>
+          {item?.topic}
+          {"\n"}
+          <Text style={styles.itemDate}>
+            {new Date(item.created_at).toLocaleString()}
+          </Text>
+        </Text>
         <TouchableOpacity>
-          <TabBarIcon size={26} name="heart-o" color={theme.tint} />
+          <TabBarIcon
+            size={26}
+            name={`heart${item.isFavorite ? "" : "-o"}`}
+            color={theme.tint}
+          />
         </TouchableOpacity>
-      </View>
+      </TouchableOpacity>
     );
   };
 
+  const goToDefinition = (word: string) => {
+    navigation.navigate("dictionaySearch", { word: word });
+  };
+
   return (
-    <KeyboardAvoidingView
-      keyboardVerticalOffset={-100}
-      style={{ flex: 1 }}
-      behavior={"height"}
-    >
-      <View style={styles.container}>
-        <View style={[styles.titleContainer]}>
-          <Text style={styles.title}>Dictionary</Text>
-        </View>
-        <View style={[styles.content]}>
-          <View style={styles.searchContainer}>
-            <TouchableOpacity>
-              <TabBarIcon size={26} name="search" color={theme.text} />
-            </TouchableOpacity>
-            <TextInput
-              placeholder="Buscar aqui..."
-              style={styles.searchInput}
-              placeholderTextColor={theme.tabIconDefault}
-              clearButtonMode="always"
-            />
-            <TouchableOpacity>
-              <TabBarIcon size={26} name="microphone" color={theme.text} />
-            </TouchableOpacity>
+    <SafeAreaView style={{ flex: 1, paddingTop: 30 }}>
+      <KeyboardAvoidingView
+        keyboardVerticalOffset={-100}
+        style={{ flex: 1 }}
+        behavior={"height"}
+      >
+        <View style={styles.container}>
+          <View style={[styles.titleContainer]}>
+            <Text style={styles.title}>Diccionario</Text>
           </View>
-          <View style={[styles.actionsButton]}>
-            <TouchableOpacity style={[styles.action]}>
-              <TabBarIcon size={26} name="search" color={theme.background} />
-              <Text style={styles.actionText}>Online{"\n"}Dictionary</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={[styles.action]}>
-              <TabBarIcon size={26} name="download" color={theme.background} />
-              <Text style={styles.actionText}>Offline{"\n"}Dictionary</Text>
-            </TouchableOpacity>
-          </View>
-          {/* wordOfDayContainer */}
-          <Text style={[styles.sectionTitle]}>Palabra del dia ☀️</Text>
-          <View style={styles.wordOfDayContainer}>
-            <View style={styles.wordOfDayBody}>
-              <Text style={styles.bodyTitle}>dog</Text>
-              <Text style={styles.bodyText}>perro</Text>
+          <View style={[styles.content]}>
+            <View style={styles.searchContainer}>
+              <TouchableOpacity>
+                <TabBarIcon size={26} name="search" color={theme.text} />
+              </TouchableOpacity>
+              <TextInput
+                placeholder="Buscar aqui..."
+                style={styles.searchInput}
+                placeholderTextColor={theme.tabIconDefault}
+                clearButtonMode="always"
+                onFocus={() => {
+                  router.navigate("/dictionaySearch");
+                }}
+              />
+              <TouchableOpacity>
+                <TabBarIcon size={26} name="microphone" color={theme.text} />
+              </TouchableOpacity>
             </View>
-            <View style={styles.wordOfDayAction}>
-              {wordOfDayActions.map((action, index) => (
-                <TouchableOpacity key={index}>
-                  <TabBarIcon
-                    iconStyle={styles.actionIcon}
-                    size={26}
-                    name={action.iconName}
-                    color={theme.background}
-                  />
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
-          <Text style={[styles.sectionTitle, { marginBottom: 5 }]}>
+            {/* <View style={[styles.actionsButton]}>
+              <TouchableOpacity style={[styles.action]}>
+                <TabBarIcon size={26} name="search" color={theme.background} />
+                <Text style={styles.actionText}>Online{"\n"}Dictionary</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.action]}>
+                <TabBarIcon
+                  size={26}
+                  name="download"
+                  color={theme.background}
+                />
+                <Text style={styles.actionText}>Offline{"\n"}Dictionary</Text>
+              </TouchableOpacity>
+            </View> */}
+            {/* wordOfDayContainer */}
+            <Text style={[styles.sectionTitle]}>Palabra del dia ☀️</Text>
+            <TouchableOpacity
+              onPress={() => goToDefinition(dailyWord || "")}
+              activeOpacity={0.9}
+              style={styles.wordOfDayContainer}
+            >
+              <View style={styles.wordOfDayBody}>
+                <Text style={styles.bodyTitle}>{dailyWord}</Text>
+              </View>
+              <View style={styles.wordOfDayAction}>
+                {wordOfDayActions.map((item, index) => (
+                  <TouchableOpacity key={index} onPress={item?.action}>
+                    <TabBarIcon
+                      iconStyle={styles.actionIcon}
+                      size={26}
+                      name={item.iconName}
+                      color={theme.background}
+                    />
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </TouchableOpacity>
+            {/* <Text style={[styles.sectionTitle, { marginBottom: 5 }]}>
             Palabras populares 🔥
           </Text>
           <View style={[styles.popularWordsContainer]}>
@@ -140,26 +167,69 @@ export default function SearchPage() {
                 paddingLeft: 1,
               }}
             />
-          </View>
-          <Text style={styles.sectionTitle}>Historial 📃</Text>
-          <View style={[styles.historyContainer]}>
-            <FlashList
-              data={historyWords}
-              renderItem={renderHistoryItem}
-              estimatedItemSize={10}
-              contentContainerStyle={{
-                paddingRight: 15,
-              }}
-            />
+          </View> */}
+            <Text style={styles.sectionTitle}>Historial 📃</Text>
+            <View style={[styles.historyContainer]}>
+              <FlashList
+                data={historyWords}
+                renderItem={renderHistoryItem}
+                estimatedItemSize={10}
+                contentContainerStyle={{
+                  paddingRight: 15,
+                }}
+                ListEmptyComponent={
+                  <View style={styles.noResultsContainer}>
+                    <Animation
+                      backgroundColor={"transparent"}
+                      source={notFoundSource}
+                      loop={true}
+                    />
+                    <Text
+                      style={[
+                        styles.noResultsText,
+                        { fontWeight: "bold", color: theme.background },
+                      ]}
+                    >
+                      Sin palabras aún.
+                    </Text>
+
+                    <Text style={[styles.noResultsText]}>
+                      ¡Haz clic en el buscador para empezar!
+                    </Text>
+                    <TabBarIcon
+                      iconStyle={styles.actionIcon}
+                      size={26}
+                      name="history"
+                      color={theme.background}
+                    />
+                  </View>
+                }
+              />
+            </View>
           </View>
         </View>
-      </View>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
 const getStyles = (colors: typeof Colors.light) =>
   StyleSheet.create({
+    noResultsContainer: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      marginTop: 10,
+      gap: 10,
+      backgroundColor: colors.tint,
+      borderRadius: 5,
+      padding: 10,
+    },
+    noResultsText: {
+      fontSize: 18,
+      color: colors.background,
+      textAlign: "center",
+    },
     container: {
       flex: 1,
     },
@@ -197,11 +267,12 @@ const getStyles = (colors: typeof Colors.light) =>
       paddingVertical: 10,
       justifyContent: "space-between",
       elevation: 5,
+      borderColor: colors.secondary,
+      borderWidth: 1,
     },
     searchInput: {
       flex: 0.9,
       height: 50,
-      zIndex: 22,
       fontSize: 22,
       color: colors.text,
       paddingHorizontal: 5,
@@ -224,6 +295,9 @@ const getStyles = (colors: typeof Colors.light) =>
       justifyContent: "flex-start",
       paddingHorizontal: 20,
       paddingVertical: 2,
+      borderColor: colors.secondary,
+      borderWidth: 1,
+      elevation: 5,
     },
     actionText: {
       color: colors.background,
@@ -248,6 +322,8 @@ const getStyles = (colors: typeof Colors.light) =>
       marginVertical: 10,
       borderRadius: 5,
       elevation: 5,
+      borderColor: colors.secondary,
+      borderWidth: 1,
     },
     wordOfDayBody: {
       backgroundColor: colors.tint,
@@ -305,6 +381,10 @@ const getStyles = (colors: typeof Colors.light) =>
       padding: 15,
       marginBottom: 10,
       elevation: 7,
+      backgroundColor: colors.background,
     },
     listHistoryLabel: { fontSize: 16 },
+    itemDate: {
+      fontSize: 10,
+    },
   });

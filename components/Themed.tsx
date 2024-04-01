@@ -36,7 +36,7 @@ export function Text(props: TextProps) {
 
   return (
     <DefaultText
-      style={[{ color, fontFamily: "Poppins" }, style]}
+      style={[{ color, fontFamily: "OpenSans" }, style]}
       {...otherProps}
     />
   );

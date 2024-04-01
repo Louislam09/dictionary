@@ -10,8 +10,9 @@ import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 
 import { useColorScheme } from "@/components/useColorScheme";
-import { SafeAreaView, StatusBar } from "react-native";
-import { View } from "@/components/Themed";
+import useTheme from "@/hooks/useTheme";
+import DatabaseProvider from "@/context/DatabaseContext";
+import DictionaryProvider from "@/context/DictionaryContext";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -30,6 +31,7 @@ export default function RootLayout() {
   const [loaded, error] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
     Poppins: require("../assets/fonts/Poppins-Medium.ttf"),
+    OpenSans: require("../assets/fonts/OpenSans-VariableFont_wdth-wght.ttf"),
     ...FontAwesome.font,
   });
 
@@ -53,16 +55,27 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
+  const theme = useTheme();
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <StatusBar barStyle="default" animated />
-      <SafeAreaView style={{ flex: 1, paddingTop: 30 }}>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="modal" options={{ presentation: "modal" }} />
-        </Stack>
-      </SafeAreaView>
+      <DatabaseProvider>
+        <DictionaryProvider>
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="modal" options={{ presentation: "modal" }} />
+            <Stack.Screen
+              name="dictionaySearch"
+              initialParams={{ word: null }}
+              options={{
+                title: "Diccionario",
+                headerStyle: { backgroundColor: theme.tint },
+                headerTintColor: theme.background,
+              }}
+            />
+          </Stack>
+        </DictionaryProvider>
+      </DatabaseProvider>
     </ThemeProvider>
   );
 }

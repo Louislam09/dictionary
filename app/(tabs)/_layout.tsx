@@ -1,7 +1,7 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Tabs } from "expo-router";
 import React, { useEffect } from "react";
-import { Pressable, StyleSheet } from "react-native";
+import { Pressable, SafeAreaView, StyleSheet } from "react-native";
 
 import { Text, View } from "@/components/Themed";
 import { useClientOnlyValue } from "@/components/useClientOnlyValue";
@@ -13,11 +13,13 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
+import useTheme from "@/hooks/useTheme";
 
 interface ITab {
   name: string;
   iconName: React.ComponentProps<typeof FontAwesome>["name"];
   fileName: string;
+  options?: any;
 }
 
 export function TabBarIcon(props: {
@@ -31,9 +33,9 @@ export function TabBarIcon(props: {
   );
 }
 
-const primaryColor = "#0097f6";
-
 const TabButton = (props: { [key: string]: any } & { item: ITab }) => {
+  const theme = useTheme();
+  const styles = getStyles(theme);
   const {
     accessibilityState: { selected },
     onPress,
@@ -65,15 +67,16 @@ const TabButton = (props: { [key: string]: any } & { item: ITab }) => {
         style={[
           styles.tabButtonContainer,
           {
-            backgroundColor: selected ? "white" : primaryColor,
+            backgroundColor: selected ? theme.background : theme.tint,
           },
+
           // animatedStyles,
         ]}
       >
         <TabBarIcon
           iconStyle={{ marginBottom: -3 }}
           name={item.iconName}
-          color={selected ? primaryColor : "white"}
+          color={selected ? theme.tint : "white"}
         />
         <Text style={{ color: selected ? "black" : "white" }}>{item.name}</Text>
       </Animated.View>
@@ -83,6 +86,8 @@ const TabButton = (props: { [key: string]: any } & { item: ITab }) => {
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const theme = useTheme();
+  const styles = getStyles(theme);
 
   const tabs: ITab[] = [
     {
@@ -94,17 +99,31 @@ export default function TabLayout() {
       name: "Favoritos",
       iconName: "heart",
       fileName: "favorite",
+      options: {
+        headerShown: true,
+      },
+    },
+    {
+      name: "Historial",
+      iconName: "history",
+      fileName: "history",
+      options: {
+        headerShown: true,
+      },
     },
     {
       name: "Ajustes",
       iconName: "gear",
       fileName: "settings",
+      options: {
+        headerShown: true,
+      },
     },
-    {
-      name: "Otro",
-      iconName: "question",
-      fileName: "pending",
-    },
+    // {
+    //   name: "Otro",
+    //   iconName: "question",
+    //   fileName: "pending",
+    // },
   ];
 
   return (
@@ -116,6 +135,9 @@ export default function TabLayout() {
           height: 60,
           borderColor: "transparent",
         },
+        headerStyle: { backgroundColor: theme.tint },
+        headerTitleStyle: { color: theme.background },
+        headerTitle: "Diccionario",
       }}
     >
       {tabs.map((item, index) => (
@@ -125,6 +147,7 @@ export default function TabLayout() {
           options={{
             title: item.name,
             tabBarButton: (props) => <TabButton {...props} item={item} />,
+            ...item.options,
           }}
         />
       ))}
@@ -132,15 +155,26 @@ export default function TabLayout() {
   );
 }
 
-const styles = StyleSheet.create({
-  tabButtonContainer: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 3,
-    paddingTop: 5,
-  },
-  activeBackground: {
-    position: "absolute",
-  },
-});
+const getStyles = (colors: typeof Colors.light) =>
+  StyleSheet.create({
+    tabButtonContainer: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 3,
+      paddingTop: 5,
+    },
+    headerContainer: {
+      height: 50,
+      backgroundColor: colors.tint,
+      width: "100%",
+      padding: 10,
+      alignItems: "flex-start",
+      justifyContent: "center",
+    },
+    headerTitle: {
+      fontSize: 22,
+      color: colors.background,
+      fontWeight: "bold",
+    },
+  });
