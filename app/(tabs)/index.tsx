@@ -14,6 +14,7 @@ import useTheme from "@/hooks/useTheme";
 import { FlashList } from "@shopify/flash-list";
 import { router, useNavigation } from "expo-router";
 import { TabBarIcon } from "./_layout";
+import speakWord from "@/utils/speak";
 
 interface IActionItem {
   iconName: any;
@@ -36,6 +37,7 @@ export default function SearchPage() {
   const wordOfDayActions: IActionItem[] = [
     {
       iconName: "volume-up",
+      action: () => speakWord(dailyWord || ""),
     },
     {
       iconName: "heart-o",
@@ -43,6 +45,7 @@ export default function SearchPage() {
     },
     {
       iconName: "search",
+      action: () => goToDefinition(dailyWord || ""),
     },
   ];
 
@@ -111,9 +114,9 @@ export default function SearchPage() {
                   router.navigate("/dictionaySearch");
                 }}
               />
-              <TouchableOpacity>
+              {/* <TouchableOpacity>
                 <TabBarIcon size={26} name="microphone" color={theme.text} />
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </View>
             {/* <View style={[styles.actionsButton]}>
               <TouchableOpacity style={[styles.action]}>
@@ -132,7 +135,6 @@ export default function SearchPage() {
             {/* wordOfDayContainer */}
             <Text style={[styles.sectionTitle]}>Palabra del dia ☀️</Text>
             <TouchableOpacity
-              onPress={() => goToDefinition(dailyWord || "")}
               activeOpacity={0.9}
               style={styles.wordOfDayContainer}
             >

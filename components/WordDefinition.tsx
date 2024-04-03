@@ -10,6 +10,7 @@ import { StyleSheet, TouchableOpacity, View } from "react-native";
 import WebView from "react-native-webview";
 import { Text } from "./Themed";
 import * as Clipboard from "expo-clipboard";
+import speakWord from "@/utils/speak";
 
 const WordDefinition = ({ wordData }: { wordData: TDictionaryData }) => {
   const theme = useTheme();
@@ -45,7 +46,7 @@ const WordDefinition = ({ wordData }: { wordData: TDictionaryData }) => {
     () => [
       {
         iconName: "volume-up",
-        action: () => console.log("volume up"),
+        action: () => speakWord(wordData.topic),
       },
       {
         iconName: `heart${fav ? "" : "-o"}`,

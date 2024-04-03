@@ -79,9 +79,9 @@ export default function SearchingResult({ setWordToSearch }: any) {
           clearButtonMode="always"
           onFocus={() => {}}
         />
-        <TouchableOpacity>
+        {/* <TouchableOpacity>
           <TabBarIcon size={26} name="microphone" color={theme.text} />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
       <View style={[styles.historyContainer]}>
         {query && !searchWords?.length ? (
