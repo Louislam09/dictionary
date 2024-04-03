@@ -1,7 +1,8 @@
 {
   "expo": {
-    "name": "dictionary",
+    "name": "Diccionario en Español - Offline",
     "slug": "dictionary",
+    "description": "Accede a un completo diccionario en español sin necesidad de conexión a internet. Amplía tu vocabulario en cualquier momento y lugar con nuestra aplicación fácil de usar y de navegación intuitiva.",
     "version": "1.0.0",
     "orientation": "default",
     "icon": "./assets/images/icon.png",
@@ -10,7 +11,7 @@
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#1a2e42"
+      "backgroundColor": "#03131b"
     },
     "assetBundlePatterns": [
       "**/*"
@@ -19,6 +20,7 @@
       "supportsTablet": true
     },
     "android": {
+      "versionCode": 1,
       "icon": "./assets/images/icon.png",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
@@ -32,7 +34,21 @@
       "favicon": "./assets/images/favicon.ico"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "enableProguardInReleaseBuilds": true
+          }
+        }
+      ],
+      [
+        "expo-updates",
+        {
+          "username": "louislam09"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
@@ -44,6 +60,16 @@
       "eas": {
         "projectId": "de69ef4a-ddf7-47fc-b8cf-ec8bf7242dd4"
       }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0,
+      "url": "https://u.expo.dev/de69ef4a-ddf7-47fc-b8cf-ec8bf7242dd4"
     }
+  },
+  "react-native-google-mobile-ads": {
+    "android_app_id": "ca-app-pub-8726117148514771~6041392998"
   }
 }

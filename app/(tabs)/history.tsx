@@ -1,15 +1,15 @@
 import { StyleSheet, TouchableOpacity } from "react-native";
 
-import EditScreenInfo from "@/components/EditScreenInfo";
-import { Text, View } from "@/components/Themed";
-import { FlashList } from "@shopify/flash-list";
-import Colors from "@/constants/Colors";
-import useTheme from "@/hooks/useTheme";
-import { TabBarIcon } from "./_layout";
+import AdBanner from "@/components/AdBanner";
 import Animation from "@/components/Animation";
-import { useNavigation } from "expo-router";
+import { Text, View } from "@/components/Themed";
+import Colors from "@/constants/Colors";
 import { useDictionaryContext } from "@/context/DictionaryContext";
+import useTheme from "@/hooks/useTheme";
 import { TFavoriteItem } from "@/types";
+import { FlashList } from "@shopify/flash-list";
+import { useNavigation } from "expo-router";
+import { TabBarIcon } from "./_layout";
 
 export default function HistoryPage() {
   const theme = useTheme();
@@ -17,7 +17,6 @@ export default function HistoryPage() {
   const { addOrRemoveFavorite, historyWords } = useDictionaryContext();
   const notFoundSource = require("../../assets/lottie/history.json");
   const navigation = useNavigation<any>();
-  console.log("historyWords", historyWords[0]);
 
   const goToDefinition = (item: TFavoriteItem) => {
     navigation.navigate("dictionaySearch", { word: item.topic, isFav: true });
@@ -56,6 +55,7 @@ export default function HistoryPage() {
 
   return (
     <View style={styles.container}>
+      <AdBanner size="ANCHORED_ADAPTIVE_BANNER" />
       <View style={[styles.historyContainer]}>
         <FlashList
           data={historyWords}

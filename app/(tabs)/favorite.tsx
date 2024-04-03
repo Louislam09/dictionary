@@ -1,18 +1,17 @@
 import { StyleSheet, TouchableOpacity } from "react-native";
 
-import EditScreenInfo from "@/components/EditScreenInfo";
-import { Text, View } from "@/components/Themed";
-import { FlashList } from "@shopify/flash-list";
-import Colors from "@/constants/Colors";
-import useTheme from "@/hooks/useTheme";
-import { TabBarIcon } from "./_layout";
-import { useDBContext } from "@/context/DatabaseContext";
-import { useEffect, useState } from "react";
-import { DELETE_FAVORITE_WORD, GET_FAVORITES } from "@/constants/Queries";
 import Animation from "@/components/Animation";
-import { useNavigation, useRouter } from "expo-router";
+import { Text, View } from "@/components/Themed";
+import Colors from "@/constants/Colors";
 import { useDictionaryContext } from "@/context/DictionaryContext";
+import useTheme from "@/hooks/useTheme";
 import { TFavoriteItem } from "@/types";
+import { FlashList } from "@shopify/flash-list";
+import { useNavigation } from "expo-router";
+import { TabBarIcon } from "./_layout";
+import AdBanner from "@/components/AdBanner";
+import useInterstitialAdBanner from "@/hooks/useInterstitialAdBanner";
+import { showRandomAd } from "@/constants/ads";
 
 export default function FavoritePage() {
   const theme = useTheme();
@@ -20,8 +19,11 @@ export default function FavoritePage() {
   const { favoriteWords, addOrRemoveFavorite } = useDictionaryContext();
   const notFoundSource = require("../../assets/lottie/addFavorite.json");
   const navigation = useNavigation<any>();
+  const { interstitial, interstitialLoaded } = useInterstitialAdBanner();
 
   const goToDefinition = (item: TFavoriteItem) => {
+    const shouldDisplayAd = showRandomAd();
+    if (shouldDisplayAd) interstitial.show();
     navigation.navigate("dictionaySearch", { word: item.topic, isFav: true });
   };
 
@@ -54,6 +56,7 @@ export default function FavoritePage() {
 
   return (
     <View style={styles.container}>
+      <AdBanner size="ANCHORED_ADAPTIVE_BANNER" />
       <View style={[styles.historyContainer]}>
         <FlashList
           data={favoriteWords}

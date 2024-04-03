@@ -15,6 +15,7 @@ import { FlashList } from "@shopify/flash-list";
 import { router, useNavigation } from "expo-router";
 import { TabBarIcon } from "./_layout";
 import speakWord from "@/utils/speak";
+import AdBanner from "@/components/AdBanner";
 
 interface IActionItem {
   iconName: any;
@@ -118,6 +119,7 @@ export default function SearchPage() {
                 <TabBarIcon size={26} name="microphone" color={theme.text} />
               </TouchableOpacity> */}
             </View>
+            <AdBanner />
             {/* <View style={[styles.actionsButton]}>
               <TouchableOpacity style={[styles.action]}>
                 <TabBarIcon size={26} name="search" color={theme.background} />

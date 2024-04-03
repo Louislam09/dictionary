@@ -1,25 +1,27 @@
 import { StyleSheet, TextInput, TouchableOpacity } from "react-native";
 
-import { Text, View } from "@/components/Themed";
-import { router } from "expo-router";
-import useTheme from "@/hooks/useTheme";
-import Colors from "@/constants/Colors";
-import { FlashList } from "@shopify/flash-list";
 import { TabBarIcon } from "@/app/(tabs)/_layout";
-import useSearch from "@/hooks/useSearch";
+import { Text, View } from "@/components/Themed";
+import { showRandomAd } from "@/constants/ads";
+import Colors from "@/constants/Colors";
 import { useDBContext } from "@/context/DatabaseContext";
+import { useDictionaryContext } from "@/context/DictionaryContext";
+import useInterstitialAdBanner from "@/hooks/useInterstitialAdBanner";
+import useSearch from "@/hooks/useSearch";
+import useTheme from "@/hooks/useTheme";
+import { FlashList } from "@shopify/flash-list";
 import { useEffect, useState } from "react";
-import removeAccent from "@/utils/removeAccent";
 import Animation from "./Animation";
-import { INSERT_FAVORITE_WORD } from "@/constants/Queries";
 
 export default function SearchingResult({ setWordToSearch }: any) {
   const theme = useTheme();
   const styles = getStyles(theme);
   const { database, executeSql } = useDBContext();
+  const { historyWords } = useDictionaryContext();
   const [query, setQuery] = useState("");
   const notFoundSource = require("../assets/lottie/search.json");
   const [searchWords, setSearchWords] = useState<any>([]);
+  const { interstitial, interstitialLoaded } = useInterstitialAdBanner();
 
   const {
     state: searchState,
@@ -47,6 +49,9 @@ export default function SearchingResult({ setWordToSearch }: any) {
   }, [query]);
 
   const onItem = (word: any) => {
+    const shouldDisplayAd = showRandomAd();
+    if (shouldDisplayAd) interstitial.show();
+
     setWordToSearch(word);
   };
 

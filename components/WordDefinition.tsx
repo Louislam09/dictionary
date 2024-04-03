@@ -86,6 +86,7 @@ const WordDefinition = ({ wordData }: { wordData: TDictionaryData }) => {
       </View>
       <View style={[styles.definitionContainer]}>
         <WebView
+          startInLoadingState
           style={{ backgroundColor: "transparent" }}
           ref={webViewRef}
           originWhitelist={["*"]}
