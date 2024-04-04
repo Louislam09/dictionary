@@ -25,7 +25,7 @@ interface ThemeProviderProps {
 }
 
 const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
-  const { storedData } = useStorage();
+  const { storedData, isDataLoaded } = useStorage();
   const colorScheme = Appearance.getColorScheme();
   const [themeScheme, setTheme] = useState<"light" | "dark">(
     colorScheme === "dark" ? "dark" : "light"
@@ -42,6 +42,7 @@ const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const theme = customTheme[themeScheme ?? "light"].colors;
 
   useEffect(() => {
+    if (!isDataLoaded) return;
     setCurrentTheme(storedData.currentTheme || "Blue");
     const subscription = Appearance.addChangeListener(({ colorScheme }) => {
       setTheme(colorScheme === "dark" ? "dark" : "light");
@@ -50,7 +51,7 @@ const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     return () => {
       subscription.remove();
     };
-  }, []);
+  }, [isDataLoaded]);
 
   const onChangeCurrentTheme = (themeColor: keyof typeof EThemes) => {
     setCurrentTheme(themeColor);
