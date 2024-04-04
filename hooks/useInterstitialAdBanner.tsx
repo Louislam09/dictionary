@@ -1,15 +1,17 @@
-import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
-import { Button, SafeAreaView, StyleSheet, Text, View } from "react-native";
+import { StyleSheet } from "react-native";
 import {
   AdEventType,
-  BannerAd,
-  BannerAdSize,
   InterstitialAd,
   TestIds,
 } from "react-native-google-mobile-ads";
 
-const interstitial = InterstitialAd.createForAdRequest(TestIds.INTERSTITIAL, {
+const GOOGLE_AD_ID =
+  (process.env.EXPO_PUBLIC_GOOGLE_INTERSTITIAL_AD_ID as string) ||
+  TestIds.BANNER;
+const adUnitId = __DEV__ ? TestIds.INTERSTITIAL : GOOGLE_AD_ID;
+
+const interstitial = InterstitialAd.createForAdRequest(adUnitId, {
   requestNonPersonalizedAdsOnly: true,
 });
 

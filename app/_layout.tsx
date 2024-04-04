@@ -7,6 +7,7 @@ import { useEffect } from "react";
 import DatabaseProvider from "@/context/DatabaseContext";
 import DictionaryProvider from "@/context/DictionaryContext";
 import ThemeProvider from "@/context/ThemeContext";
+import StorageProvider from "@/context/LocalstoreContext";
 
 export { ErrorBoundary } from "expo-router";
 
@@ -44,19 +45,21 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   return (
-    <ThemeProvider>
-      <DatabaseProvider>
-        <DictionaryProvider>
-          <Stack>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="modal" options={{ presentation: "modal" }} />
-            <Stack.Screen
-              name="dictionaySearch"
-              initialParams={{ word: null }}
-            />
-          </Stack>
-        </DictionaryProvider>
-      </DatabaseProvider>
-    </ThemeProvider>
+    <StorageProvider>
+      <ThemeProvider>
+        <DatabaseProvider>
+          <DictionaryProvider>
+            <Stack>
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name="modal" options={{ presentation: "modal" }} />
+              <Stack.Screen
+                name="dictionaySearch"
+                initialParams={{ word: null }}
+              />
+            </Stack>
+          </DictionaryProvider>
+        </DatabaseProvider>
+      </ThemeProvider>
+    </StorageProvider>
   );
 }

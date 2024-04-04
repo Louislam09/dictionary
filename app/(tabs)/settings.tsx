@@ -17,6 +17,7 @@ import { TabBarIcon } from "./_layout";
 import { FlashList } from "@shopify/flash-list";
 import { EThemes } from "@/types";
 import { useCallback } from "react";
+import { useStorage } from "@/context/LocalstoreContext";
 
 type TOption = {
   label: string;
@@ -39,6 +40,7 @@ export default function SettingsPage() {
   const styles = getStyles(theme);
   const { deleteHistory } = useDictionaryContext();
   const { toggleTheme, theme: _themeScheme } = useCustomTheme();
+  const { storedData, saveData, isDataLoaded } = useStorage();
 
   const openAppInStore = async (appPackage: string) => {
     await Linking.openURL(appPackage);
@@ -77,7 +79,11 @@ export default function SettingsPage() {
     return Object.values(EThemes).map((color, index) => ({
       label: colorsKey[index],
       iconName: color,
-      action: () => onChangeCurrentTheme(colorsKey[index]),
+      action: () => {
+        const currentTheme = colorsKey[index];
+        saveData({ currentTheme });
+        onChangeCurrentTheme(currentTheme);
+      },
       extraText: "",
     }));
   }, []);

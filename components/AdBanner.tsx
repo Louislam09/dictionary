@@ -5,9 +5,9 @@ import {
   BannerAdSize,
   TestIds,
 } from "react-native-google-mobile-ads";
-const adUnitId = __DEV__
-  ? TestIds.BANNER
-  : "ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyyyyyy";
+const GOOGLE_AD_ID =
+  (process.env.EXPO_PUBLIC_GOOGLE_BANNER_AD_ID as string) || TestIds.BANNER;
+const adUnitId = __DEV__ ? TestIds.BANNER : GOOGLE_AD_ID;
 
 const AdBanner = ({ size }: { size?: keyof typeof BannerAdSize }) => {
   return (

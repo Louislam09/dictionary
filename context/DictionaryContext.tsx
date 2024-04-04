@@ -2,8 +2,7 @@
 import React, { createContext, useContext, useEffect, useReducer } from "react";
 // import useCustomFonts from "../hooks/useCustomFonts";
 
-import { useDBContext } from "./DatabaseContext";
-import useSearch from "@/hooks/useSearch";
+import dailyWords from "@/constants/dailyWords";
 import {
   DELETE_FAVORITE_WORD,
   DELETE_HISTORY_DATA,
@@ -13,9 +12,9 @@ import {
   INSERT_FAVORITE_WORD,
   INSERT_HISTORY_WORD,
 } from "@/constants/Queries";
-import { TDictionaryData, TFavoriteItem } from "@/types";
+import { TFavoriteItem } from "@/types";
 import { ToastAndroid } from "react-native";
-import dailyWords from "@/constants/dailyWords";
+import { useDBContext } from "./DatabaseContext";
 
 type DictionaryState = {
   favoriteWords: TFavoriteItem[];

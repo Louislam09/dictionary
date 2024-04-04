@@ -8,8 +8,12 @@ import {
   TestIds,
 } from "react-native-google-mobile-ads";
 
+const GOOGLE_AD_ID =
+  (process.env.EXPO_PUBLIC_GOOGLE_REWARDED_AD_ID as string) || TestIds.BANNER;
+const adUnitId = __DEV__ ? TestIds.REWARDED_INTERSTITIAL : GOOGLE_AD_ID;
+
 const rewardedInterstitial = RewardedInterstitialAd.createForAdRequest(
-  TestIds.REWARDED_INTERSTITIAL,
+  adUnitId,
   {
     requestNonPersonalizedAdsOnly: true,
   }

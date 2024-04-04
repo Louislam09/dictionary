@@ -9,6 +9,7 @@ import React, {
   ReactNode,
 } from "react";
 import { Appearance } from "react-native";
+import { useStorage } from "./LocalstoreContext";
 
 interface ThemeContextProps {
   themeScheme: "light" | "dark";
@@ -24,6 +25,7 @@ interface ThemeProviderProps {
 }
 
 const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
+  const { storedData } = useStorage();
   const colorScheme = Appearance.getColorScheme();
   const [themeScheme, setTheme] = useState<"light" | "dark">(
     colorScheme === "dark" ? "dark" : "light"
@@ -40,6 +42,7 @@ const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const theme = customTheme[themeScheme ?? "light"].colors;
 
   useEffect(() => {
+    setCurrentTheme(storedData.currentTheme || "Blue");
     const subscription = Appearance.addChangeListener(({ colorScheme }) => {
       setTheme(colorScheme === "dark" ? "dark" : "light");
     });
