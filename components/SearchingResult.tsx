@@ -8,16 +8,15 @@ import { useDBContext } from "@/context/DatabaseContext";
 import { useDictionaryContext } from "@/context/DictionaryContext";
 import useInterstitialAdBanner from "@/hooks/useInterstitialAdBanner";
 import useSearch from "@/hooks/useSearch";
-import useTheme from "@/hooks/useTheme";
 import { FlashList } from "@shopify/flash-list";
 import { useEffect, useState } from "react";
 import Animation from "./Animation";
+import { useCustomTheme } from "@/context/ThemeContext";
 
 export default function SearchingResult({ setWordToSearch }: any) {
-  const theme = useTheme();
+  const { theme } = useCustomTheme();
   const styles = getStyles(theme);
   const { database, executeSql } = useDBContext();
-  const { historyWords } = useDictionaryContext();
   const [query, setQuery] = useState("");
   const notFoundSource = require("../assets/lottie/search.json");
   const [searchWords, setSearchWords] = useState<any>([]);
@@ -79,7 +78,7 @@ export default function SearchingResult({ setWordToSearch }: any) {
         <TextInput
           placeholder="Buscar aqui..."
           style={styles.searchInput}
-          placeholderTextColor={theme.tabIconDefault}
+          placeholderTextColor={theme.text}
           onChangeText={handelSearch}
           clearButtonMode="always"
           onFocus={() => {}}
@@ -92,7 +91,7 @@ export default function SearchingResult({ setWordToSearch }: any) {
         {query && !searchWords?.length ? (
           <View style={styles.noResultsContainer}>
             <Animation
-              backgroundColor={theme.background}
+              backgroundColor={"transparent"}
               source={notFoundSource}
               loop={true}
             />
@@ -126,6 +125,7 @@ const getStyles = (colors: typeof Colors.light) =>
       flex: 1,
       alignItems: "center",
       justifyContent: "center",
+      backgroundColor: colors.background,
     },
     noResultsText: {
       fontSize: 18,
@@ -145,6 +145,9 @@ const getStyles = (colors: typeof Colors.light) =>
       paddingVertical: 10,
       justifyContent: "space-between",
       elevation: 5,
+      borderColor: colors.text,
+      borderWidth: 1,
+      backgroundColor: colors.background,
     },
     searchInput: {
       flex: 0.9,
@@ -162,6 +165,7 @@ const getStyles = (colors: typeof Colors.light) =>
       height: "100%",
       width: "100%",
       marginTop: 20,
+      backgroundColor: colors.background,
     },
     listItem: {
       flex: 1,
@@ -183,5 +187,8 @@ const getStyles = (colors: typeof Colors.light) =>
       padding: 15,
       marginBottom: 10,
     },
-    listHistoryLabel: { fontSize: 16 },
+    listHistoryLabel: {
+      fontSize: 16,
+      color: colors.text,
+    },
   });

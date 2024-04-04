@@ -3,21 +3,31 @@ import { StyleSheet } from "react-native";
 import SearchingResult from "@/components/SearchingResult";
 import { View } from "@/components/Themed";
 import Colors from "@/constants/Colors";
-import useTheme from "@/hooks/useTheme";
 import WordDefinition from "@/components/WordDefinition";
 import { useEffect, useState } from "react";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useNavigation } from "expo-router";
 import { useDictionaryContext } from "@/context/DictionaryContext";
 import { TDictionaryData } from "@/types";
+import { useCustomTheme } from "@/context/ThemeContext";
 
 export default function SearchingPage() {
-  const theme = useTheme();
+  const { theme } = useCustomTheme();
   const styles = getStyles(theme);
   const [wordToSearch, setWordToSearch] = useState<TDictionaryData | null>(
     null
   );
   const { word } = useLocalSearchParams();
   const { fetchWord } = useDictionaryContext();
+
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    navigation.setOptions({
+      title: "Diccionario",
+      headerStyle: { backgroundColor: theme.tint },
+      headerTintColor: "white",
+    });
+  }, [navigation]);
 
   useEffect(() => {
     if (!word) return;

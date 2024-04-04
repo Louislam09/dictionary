@@ -2,19 +2,19 @@ import { TabBarIcon } from "@/app/(tabs)/_layout";
 import Colors from "@/constants/Colors";
 import { htmlTemplate } from "@/constants/HtmlTemplate";
 import { useDictionaryContext } from "@/context/DictionaryContext";
-import useTheme from "@/hooks/useTheme";
 import { TDictionaryData } from "@/types";
+import speakWord from "@/utils/speak";
+import * as Clipboard from "expo-clipboard";
 import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import WebView from "react-native-webview";
 import { Text } from "./Themed";
-import * as Clipboard from "expo-clipboard";
-import speakWord from "@/utils/speak";
+import { useCustomTheme } from "@/context/ThemeContext";
 
 const WordDefinition = ({ wordData }: { wordData: TDictionaryData }) => {
-  const theme = useTheme();
-  const styles = getStyles(theme);
+  const { theme, themeScheme } = useCustomTheme();
+  const styles = getStyles(theme, themeScheme === "dark");
   const webViewRef = useRef<WebView>(null);
   const { definition, topic, isFavorite } = wordData;
   const { isFav } = useLocalSearchParams();
@@ -104,7 +104,7 @@ const WordDefinition = ({ wordData }: { wordData: TDictionaryData }) => {
 
 export default WordDefinition;
 
-const getStyles = (colors: typeof Colors.light) =>
+const getStyles = (colors: typeof Colors.light, isDark?: boolean) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -142,7 +142,9 @@ const getStyles = (colors: typeof Colors.light) =>
       paddingVertical: 15,
       borderRadius: 10,
     },
-    actionIcon: {},
+    actionIcon: {
+      color: isDark ? colors.text : colors.background,
+    },
     sectionTitle: {
       color: colors.text,
       alignSelf: "flex-start",

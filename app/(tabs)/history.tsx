@@ -5,18 +5,19 @@ import Animation from "@/components/Animation";
 import { Text, View } from "@/components/Themed";
 import Colors from "@/constants/Colors";
 import { useDictionaryContext } from "@/context/DictionaryContext";
-import useTheme from "@/hooks/useTheme";
+import { useCustomTheme } from "@/context/ThemeContext";
 import { TFavoriteItem } from "@/types";
 import { FlashList } from "@shopify/flash-list";
 import { useNavigation } from "expo-router";
 import { TabBarIcon } from "./_layout";
 
 export default function HistoryPage() {
-  const theme = useTheme();
+  const { theme, themeScheme } = useCustomTheme();
   const styles = getStyles(theme);
   const { addOrRemoveFavorite, historyWords } = useDictionaryContext();
   const notFoundSource = require("../../assets/lottie/history.json");
   const navigation = useNavigation<any>();
+  const isDark = themeScheme === "dark";
 
   const goToDefinition = (item: TFavoriteItem) => {
     navigation.navigate("dictionaySearch", { word: item.topic, isFav: true });
@@ -33,12 +34,18 @@ export default function HistoryPage() {
       <TouchableOpacity
         onPress={() => goToDefinition(item)}
         key={"-" + index}
-        style={[styles.listItem, styles.historyItem]}
+        style={[
+          styles.listItem,
+          styles.historyItem,
+          isDark && { borderColor: theme.text },
+        ]}
       >
-        <Text style={[styles.listHistoryLabel]}>
+        <Text
+          style={[styles.listHistoryLabel, isDark && { color: theme.text }]}
+        >
           {item?.topic}
           {"\n"}
-          <Text style={styles.itemDate}>
+          <Text style={[styles.itemDate, isDark && { color: theme.text }]}>
             {new Date(item.created_at).toLocaleString()}
           </Text>
         </Text>
@@ -46,7 +53,7 @@ export default function HistoryPage() {
           <TabBarIcon
             size={26}
             name={`heart${item.isFavorite ? "" : "-o"}`}
-            color={theme.tint}
+            color={isDark ? theme.text : theme.tint}
           />
         </TouchableOpacity>
       </TouchableOpacity>
@@ -58,6 +65,7 @@ export default function HistoryPage() {
       <AdBanner size="ANCHORED_ADAPTIVE_BANNER" />
       <View style={[styles.historyContainer]}>
         <FlashList
+          key={themeScheme}
           data={historyWords}
           renderItem={renderHistoryItem}
           estimatedItemSize={10}
@@ -105,6 +113,7 @@ const getStyles = (colors: typeof Colors.light) =>
       width: "100%",
       marginTop: 20,
       paddingHorizontal: 10,
+      backgroundColor: colors.background,
     },
     listItem: {
       flex: 1,
@@ -112,10 +121,14 @@ const getStyles = (colors: typeof Colors.light) =>
       flexDirection: "row",
       paddingHorizontal: 20,
       alignItems: "center",
+      borderColor: colors.secondary,
+      borderWidth: 1,
+      elevation: 7,
       justifyContent: "space-between",
       gap: 10,
       marginHorizontal: 5,
       borderRadius: 5,
+      backgroundColor: colors.background,
     },
     historyItem: {
       width: "100%",
@@ -123,17 +136,22 @@ const getStyles = (colors: typeof Colors.light) =>
       justifyContent: "space-between",
       padding: 15,
       marginBottom: 15,
-      backgroundColor: colors.background,
       elevation: 5,
       position: "relative",
+      backgroundColor: colors.background,
       // paddingBottom: 30,
     },
-    listHistoryLabel: { fontSize: 16, textTransform: "capitalize" },
+    listHistoryLabel: {
+      fontSize: 16,
+      textTransform: "capitalize",
+      fontWeight: "bold",
+    },
     container: {
       flex: 1,
       alignItems: "center",
       justifyContent: "center",
       fontWeight: "bold",
+      backgroundColor: colors.background,
     },
     title: {
       fontSize: 20,

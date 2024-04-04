@@ -1,19 +1,19 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Tabs } from "expo-router";
 import React, { useEffect } from "react";
-import { Pressable, SafeAreaView, StyleSheet } from "react-native";
+import { Pressable, StyleSheet } from "react-native";
 
-import { Text, View } from "@/components/Themed";
+import { Text } from "@/components/Themed";
 import { useClientOnlyValue } from "@/components/useClientOnlyValue";
 import { useColorScheme } from "@/components/useColorScheme";
 import Colors from "@/constants/Colors";
+import { useCustomTheme } from "@/context/ThemeContext";
 import Animated, {
   Easing,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
-import useTheme from "@/hooks/useTheme";
 
 interface ITab {
   name: string;
@@ -34,13 +34,13 @@ export function TabBarIcon(props: {
 }
 
 const TabButton = (props: { [key: string]: any } & { item: ITab }) => {
-  const theme = useTheme();
-  const styles = getStyles(theme);
   const {
     accessibilityState: { selected },
     onPress,
     item,
+    theme,
   } = props;
+  const styles = getStyles(theme);
   const offset = useSharedValue(0);
 
   const animatedStyles = useAnimatedStyle(() => ({
@@ -69,8 +69,6 @@ const TabButton = (props: { [key: string]: any } & { item: ITab }) => {
           {
             backgroundColor: selected ? theme.background : theme.tint,
           },
-
-          // animatedStyles,
         ]}
       >
         <TabBarIcon
@@ -78,7 +76,9 @@ const TabButton = (props: { [key: string]: any } & { item: ITab }) => {
           name={item.iconName}
           color={selected ? theme.tint : "white"}
         />
-        <Text style={{ color: selected ? "black" : "white" }}>{item.name}</Text>
+        <Text style={{ color: selected ? theme.text : "white" }}>
+          {item.name}
+        </Text>
       </Animated.View>
     </Pressable>
   );
@@ -86,8 +86,7 @@ const TabButton = (props: { [key: string]: any } & { item: ITab }) => {
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
-  const theme = useTheme();
-  const styles = getStyles(theme);
+  const { theme } = useCustomTheme();
 
   const tabs: ITab[] = [
     {
@@ -133,10 +132,10 @@ export default function TabLayout() {
         headerShown: useClientOnlyValue(false, false),
         tabBarStyle: {
           height: 60,
-          borderColor: "transparent",
+          borderColor: theme.background,
         },
         headerStyle: { backgroundColor: theme.tint },
-        headerTitleStyle: { color: theme.background },
+        headerTitleStyle: { color: "white" },
         headerTitle: "Diccionario",
       }}
     >
@@ -146,7 +145,9 @@ export default function TabLayout() {
           name={item.fileName}
           options={{
             title: item.name,
-            tabBarButton: (props) => <TabButton {...props} item={item} />,
+            tabBarButton: (props) => (
+              <TabButton {...props} theme={theme} item={item} />
+            ),
             ...item.options,
           }}
         />
