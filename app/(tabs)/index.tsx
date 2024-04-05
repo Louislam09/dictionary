@@ -75,7 +75,7 @@ export default function SearchPage() {
             {new Date(item.created_at).toLocaleString()}
           </Text>
         </Text>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => addOrRemoveFavorite?.(item)}>
           <TabBarIcon
             size={26}
             name={`heart${item.isFavorite ? "" : "-o"}`}

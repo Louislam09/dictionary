@@ -49,7 +49,7 @@ export default function HistoryPage() {
             {new Date(item.created_at).toLocaleString()}
           </Text>
         </Text>
-        <TouchableOpacity onPress={() => addOrRemoveFavorite?.(item.id)}>
+        <TouchableOpacity onPress={() => addOrRemoveFavorite?.(item)}>
           <TabBarIcon
             size={26}
             name={`heart${item.isFavorite ? "" : "-o"}`}
