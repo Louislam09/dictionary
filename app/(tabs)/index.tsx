@@ -75,7 +75,7 @@ export default function SearchPage() {
             {new Date(item.created_at).toLocaleString()}
           </Text>
         </Text>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => addOrRemoveFavorite?.(item)}>
           <TabBarIcon
             size={26}
             name={`heart${item.isFavorite ? "" : "-o"}`}
@@ -120,7 +120,7 @@ export default function SearchPage() {
               </TouchableOpacity> */}
             </View>
             <AdBanner />
-            <Text style={[styles.sectionTitle]}>Palabra del dia ☀️</Text>
+            <Text style={[styles.sectionTitle]}>Palabra Aleatoria ☀️</Text>
             <TouchableOpacity
               activeOpacity={0.9}
               style={styles.wordOfDayContainer}

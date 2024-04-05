@@ -127,6 +127,7 @@ const DictionaryProvider: React.FC<{ children: React.ReactNode }> = ({
     executeSql(myDictionaryDB, query, params)
       .then(async () => {
         await fetchFavoriteWords();
+        await fetchHistoryWords();
       })
       .catch(console.log);
   };
