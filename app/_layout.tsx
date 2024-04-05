@@ -8,6 +8,7 @@ import DatabaseProvider from "@/context/DatabaseContext";
 import DictionaryProvider from "@/context/DictionaryContext";
 import ThemeProvider from "@/context/ThemeContext";
 import StorageProvider from "@/context/LocalstoreContext";
+import { StatusBar } from "expo-status-bar";
 
 export { ErrorBoundary } from "expo-router";
 
@@ -47,6 +48,7 @@ function RootLayoutNav() {
       <ThemeProvider>
         <DatabaseProvider>
           <DictionaryProvider>
+            <StatusBar style="auto" animated />
             <Stack>
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
               <Stack.Screen name="modal" options={{ presentation: "modal" }} />
