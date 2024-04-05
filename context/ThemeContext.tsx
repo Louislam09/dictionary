@@ -31,7 +31,7 @@ const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     colorScheme === "dark" ? "dark" : "light"
   );
   const [currentTheme, setCurrentTheme] =
-    useState<keyof typeof EThemes>("Blue");
+    useState<keyof typeof EThemes>("BlackWhite");
 
   const themes = getThemes();
   const { DarkTheme, LightTheme } = themes[currentTheme];
