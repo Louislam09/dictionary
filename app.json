@@ -62,7 +62,7 @@
       }
     },
     "runtimeVersion": {
-      "policy": "appVersion"
+      "policy": "nativeVersion"
     },
     "updates": {
       "fallbackToCacheTimeout": 0,
