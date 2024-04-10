@@ -11,6 +11,8 @@ import StorageProvider from "@/context/LocalstoreContext";
 import { StatusBar } from "expo-status-bar";
 
 export { ErrorBoundary } from "expo-router";
+import * as Updates from "expo-updates";
+import { ToastAndroid } from "react-native";
 
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
@@ -24,6 +26,24 @@ export default function RootLayout() {
     OpenSans: require("../assets/fonts/OpenSans-VariableFont_wdth-wght.ttf"),
     ...FontAwesome.font,
   });
+
+  async function onFetchUpdateAsync() {
+    try {
+      const update = await Updates.checkForUpdateAsync();
+
+      if (update.isAvailable) {
+        await Updates.fetchUpdateAsync();
+        await Updates.reloadAsync();
+        ToastAndroid.show("Actualizada ✅", ToastAndroid.SHORT);
+      }
+    } catch (error) {
+      ToastAndroid.show("🔄", ToastAndroid.SHORT);
+    }
+  }
+
+  useEffect(() => {
+    onFetchUpdateAsync();
+  }, []);
 
   useEffect(() => {
     if (error) throw error;
