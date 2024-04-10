@@ -25,7 +25,7 @@ interface ThemeProviderProps {
 }
 
 const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
-  const { storedData, isDataLoaded } = useStorage();
+  const { storedData, isDataLoaded, saveData } = useStorage();
   const colorScheme = Appearance.getColorScheme();
   const [themeScheme, setTheme] = useState<"light" | "dark">(
     colorScheme === "dark" ? "dark" : "light"
@@ -44,6 +44,8 @@ const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   useEffect(() => {
     if (!isDataLoaded) return;
     setCurrentTheme(storedData.currentTheme || "Blue");
+    storedData.isDarkMode && setTheme("dark");
+
     const subscription = Appearance.addChangeListener(({ colorScheme }) => {
       setTheme(colorScheme === "dark" ? "dark" : "light");
     });
@@ -62,6 +64,7 @@ const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
       setTheme(scheme);
       return;
     }
+    saveData({ isDarkMode: themeScheme === "dark" });
     setTheme((colorScheme) => (colorScheme === "light" ? "dark" : "light"));
   };
 

@@ -106,7 +106,9 @@ export default function SettingsPage() {
         {
           label: "Modo Claro / Modo Oscuro",
           iconName: `${themeScheme === "dark" ? "sun" : "moon"}-o`,
-          action: toggleTheme,
+          action: () => {
+            toggleTheme();
+          },
           extraText: "Cambiar entre el modo claro y el modo oscuro",
         },
       ],
