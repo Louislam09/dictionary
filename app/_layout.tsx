@@ -6,13 +6,13 @@ import { useEffect } from "react";
 
 import DatabaseProvider from "@/context/DatabaseContext";
 import DictionaryProvider from "@/context/DictionaryContext";
-import ThemeProvider from "@/context/ThemeContext";
 import StorageProvider from "@/context/LocalstoreContext";
+import ThemeProvider from "@/context/ThemeContext";
 import { StatusBar } from "expo-status-bar";
-
-export { ErrorBoundary } from "expo-router";
 import * as Updates from "expo-updates";
 import { ToastAndroid } from "react-native";
+
+export { ErrorBoundary } from "expo-router";
 
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
