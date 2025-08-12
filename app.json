@@ -20,7 +20,7 @@
       "supportsTablet": true
     },
     "android": {
-      "versionCode": 2,
+      "versionCode": 3,
       "icon": "./assets/images/icon.png",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
@@ -62,7 +62,7 @@
       }
     },
     "runtimeVersion": {
-      "policy": "nativeVersion"
+      "policy": "appVersion"
     },
     "updates": {
       "fallbackToCacheTimeout": 0,

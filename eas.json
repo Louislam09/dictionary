@@ -28,7 +28,11 @@
       "channel": "production"
     }
   },
-  "submit": {
-    "production": {}
+ "submit": {
+    "production": {
+      "android": {
+        "track": "production"
+      }
+    }
   }
 }

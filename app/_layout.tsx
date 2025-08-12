@@ -11,6 +11,7 @@ import ThemeProvider from "@/context/ThemeContext";
 import { StatusBar } from "expo-status-bar";
 import * as Updates from "expo-updates";
 import { ToastAndroid } from "react-native";
+import mobileAds, { MaxAdContentRating } from "react-native-google-mobile-ads";
 
 export { ErrorBoundary } from "expo-router";
 
@@ -26,6 +27,21 @@ export default function RootLayout() {
     OpenSans: require("../assets/fonts/OpenSans-VariableFont_wdth-wght.ttf"),
     ...FontAwesome.font,
   });
+
+  // ✅ Set family-safe ad configuration at app startup
+  useEffect(() => {
+    mobileAds()
+      .setRequestConfiguration({
+        maxAdContentRating: MaxAdContentRating.G, // Only G-rated ads
+        tagForChildDirectedTreatment: true,       // COPPA compliance
+        tagForUnderAgeOfConsent: true,            // GDPR compliance
+      })
+      .then(() => {
+        console.log("AdMob family-safe configuration set ✅");
+        // Start loading ads SDK
+        mobileAds().initialize();
+      });
+  }, []);
 
   async function onFetchUpdateAsync() {
     try {

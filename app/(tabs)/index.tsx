@@ -13,11 +13,11 @@ import { Text } from "@/components/Themed";
 import Colors from "@/constants/Colors";
 import { useDictionaryContext } from "@/context/DictionaryContext";
 import { useCustomTheme } from "@/context/ThemeContext";
+import { TFavoriteItem } from "@/types";
 import speakWord from "@/utils/speak";
 import { FlashList } from "@shopify/flash-list";
 import { router, useNavigation } from "expo-router";
 import { TabBarIcon } from "./_layout";
-import { TFavoriteItem } from "@/types";
 
 interface IActionItem {
   iconName: any;
@@ -91,7 +91,7 @@ export default function SearchPage() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, paddingTop: 30 }}>
+    <SafeAreaView style={{ flex: 1, paddingTop: 30 }} key={themeScheme}>
       <KeyboardAvoidingView
         keyboardVerticalOffset={-100}
         style={{ flex: 1 }}
@@ -362,7 +362,10 @@ const getStyles = (colors: typeof Colors.light, isDark?: boolean) =>
       elevation: 7,
       backgroundColor: colors.background,
     },
-    listHistoryLabel: { fontSize: 16, fontWeight: "bold" },
+    listHistoryLabel: {
+      fontSize: 16,
+      fontWeight: "bold"
+    },
     itemDate: {
       fontSize: 10,
     },
