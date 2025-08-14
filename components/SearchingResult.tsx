@@ -1,6 +1,5 @@
 import { StyleSheet, TextInput, TouchableOpacity } from "react-native";
 
-import { TabBarIcon } from "@/app/(tabs)/_layout";
 import { Text, View } from "@/components/Themed";
 import { showRandomAd } from "@/constants/ads";
 import Colors from "@/constants/Colors";
@@ -12,6 +11,7 @@ import { FlashList } from "@shopify/flash-list";
 import { useEffect, useState } from "react";
 import Animation from "./Animation";
 import { useCustomTheme } from "@/context/ThemeContext";
+import MyIcon from "./MyIcon";
 
 export default function SearchingResult({ setWordToSearch }: any) {
   const { theme } = useCustomTheme();
@@ -22,11 +22,7 @@ export default function SearchingResult({ setWordToSearch }: any) {
   const [searchWords, setSearchWords] = useState<any>([]);
   const { interstitial, interstitialLoaded } = useInterstitialAdBanner();
 
-  const {
-    state: searchState,
-    performSearch,
-    setSearchTerm,
-  } = useSearch({ db: database });
+  const { state: searchState, performSearch, setSearchTerm } = useSearch();
 
   useEffect(() => {
     setSearchWords(searchState.searchResults);
@@ -63,7 +59,7 @@ export default function SearchingResult({ setWordToSearch }: any) {
       >
         <Text style={[styles.listHistoryLabel]}>{item?.topic}</Text>
         <TouchableOpacity>
-          <TabBarIcon size={26} name="search" color={theme.tint} />
+          <MyIcon size={26} name="Search" color={theme.tint} />
         </TouchableOpacity>
       </TouchableOpacity>
     );
@@ -73,15 +69,16 @@ export default function SearchingResult({ setWordToSearch }: any) {
     <>
       <View style={styles.searchContainer}>
         <TouchableOpacity>
-          <TabBarIcon size={26} name="search" color={theme.text} />
+          <MyIcon size={26} name="Search" color={theme.text} />
         </TouchableOpacity>
         <TextInput
+          autoFocus
           placeholder="Buscar aqui..."
           style={styles.searchInput}
           placeholderTextColor={theme.text}
           onChangeText={handelSearch}
           clearButtonMode="always"
-          onFocus={() => {}}
+          onFocus={() => { }}
         />
         {/* <TouchableOpacity>
           <TabBarIcon size={26} name="microphone" color={theme.text} />
@@ -101,7 +98,6 @@ export default function SearchingResult({ setWordToSearch }: any) {
           <FlashList
             data={searchWords || []}
             renderItem={renderHistoryItem}
-            estimatedItemSize={10}
             contentContainerStyle={{
               paddingRight: 15,
             }}

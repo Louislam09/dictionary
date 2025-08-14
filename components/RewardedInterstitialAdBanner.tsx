@@ -1,6 +1,5 @@
-import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
-import { Button, SafeAreaView, StyleSheet, Text, View } from "react-native";
+import { Button, StyleSheet, Text } from "react-native";
 import {
   AdEventType,
   RewardedAdEventType,

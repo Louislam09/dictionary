@@ -1,6 +1,9 @@
 import * as SQLite from "expo-sqlite";
 import React, { createContext, useContext } from "react";
 import useDatabase from "../hooks/useDatabase";
+import { Text, View } from "@/components/Themed";
+import { ActivityIndicator } from "react-native";
+import useTheme from "@/hooks/useTheme";
 
 interface Row {
   [key: string]: any;
@@ -8,17 +11,23 @@ interface Row {
 
 type DatabaseContextType = {
   database?: SQLite.SQLiteDatabase | null;
-  executeSql?:
-    | ((
-        db: SQLite.SQLiteDatabase,
-        sql: string,
-        params?: any[]
-      ) => Promise<Row[]>)
-    | null;
+  executeSql: <T = any>(
+    sql: string,
+    params?: any[],
+    queryName?: string
+  ) => Promise<T[]>;
+  // executeSql?:
+  //   | ((
+  //       db: SQLite.SQLiteDatabase,
+  //       sql: string,
+  //       params?: any[]
+  //     ) => Promise<Row[]>)
+  //   | null;
 };
 
 const initialContext = {
   database: null,
+  executeSql: async (sql: string, params?: any[], queryName?: string) => [],
 };
 
 export const DatabaseContext =
@@ -27,12 +36,20 @@ export const DatabaseContext =
 const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const { database, executeSql } = useDatabase();
+  const { database, executeSql, isDatabaseReady, error } = useDatabase();
+  const theme = useTheme()
 
   const dbContextValue = {
     database,
     executeSql,
   };
+
+  if (!isDatabaseReady || !database) {
+    return <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <ActivityIndicator color={theme.tint} size="large" />
+      <Text>Cargando...</Text>
+    </View>
+  }
 
   return (
     <DatabaseContext.Provider value={dbContextValue}>

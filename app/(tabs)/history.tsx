@@ -3,13 +3,13 @@ import { StyleSheet, TouchableOpacity } from "react-native";
 import AdBanner from "@/components/AdBanner";
 import Animation from "@/components/Animation";
 import { Text, View } from "@/components/Themed";
-import Colors from "@/constants/Colors";
+import { MyColors } from "@/constants/themeColors";
 import { useDictionaryContext } from "@/context/DictionaryContext";
 import { useCustomTheme } from "@/context/ThemeContext";
 import { TFavoriteItem } from "@/types";
 import { FlashList } from "@shopify/flash-list";
 import { useNavigation } from "expo-router";
-import { TabBarIcon } from "./_layout";
+import MyIcon from "@/components/MyIcon";
 
 export default function HistoryPage() {
   const { theme, themeScheme } = useCustomTheme();
@@ -37,23 +37,23 @@ export default function HistoryPage() {
         style={[
           styles.listItem,
           styles.historyItem,
-          isDark && { borderColor: theme.text },
         ]}
       >
         <Text
-          style={[styles.listHistoryLabel, isDark && { color: theme.text }]}
+          style={[styles.listHistoryLabel]}
         >
           {item?.topic}
           {"\n"}
-          <Text style={[styles.itemDate, isDark && { color: theme.text }]}>
+          <Text style={[styles.itemDate]}>
             {new Date(item.created_at).toLocaleString()}
           </Text>
         </Text>
         <TouchableOpacity onPress={() => addOrRemoveFavorite?.(item)}>
-          <TabBarIcon
+          <MyIcon
             size={26}
-            name={`heart${item.isFavorite ? "" : "-o"}`}
-            color={isDark ? theme.text : theme.tint}
+            name={"Heart"}
+            fillColor={item.isFavorite ? theme.tint : ""}
+            color={item.isFavorite ? theme.tint : theme.textSecondary}
           />
         </TouchableOpacity>
       </TouchableOpacity>
@@ -68,7 +68,6 @@ export default function HistoryPage() {
           key={themeScheme}
           data={historyWords}
           renderItem={renderHistoryItem}
-          estimatedItemSize={10}
           contentContainerStyle={{
             paddingRight: 15,
           }}
@@ -93,10 +92,11 @@ export default function HistoryPage() {
   );
 }
 
-const getStyles = (colors: typeof Colors.light) =>
+const getStyles = (colors: MyColors) =>
   StyleSheet.create({
     itemDate: {
       fontSize: 10,
+      color: colors.textSecondary
     },
     noResultsContainer: {
       flex: 1,
@@ -121,7 +121,7 @@ const getStyles = (colors: typeof Colors.light) =>
       flexDirection: "row",
       paddingHorizontal: 20,
       alignItems: "center",
-      borderColor: colors.secondary,
+      borderColor: colors.textSecondary + 90,
       borderWidth: 1,
       elevation: 7,
       justifyContent: "space-between",
@@ -138,13 +138,14 @@ const getStyles = (colors: typeof Colors.light) =>
       marginBottom: 15,
       elevation: 5,
       position: "relative",
-      backgroundColor: colors.background,
+      backgroundColor: colors.text + 20,
       // paddingBottom: 30,
     },
     listHistoryLabel: {
       fontSize: 16,
       textTransform: "capitalize",
       fontWeight: "bold",
+      color: colors.text,
     },
     container: {
       flex: 1,

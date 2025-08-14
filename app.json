@@ -20,13 +20,14 @@
       "supportsTablet": true
     },
     "android": {
+      "edgeToEdgeEnabled": true,
       "versionCode": 3,
       "icon": "./assets/images/icon.png",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#000D16"
       },
-      "package": "com.louislam09.dictionary"
+      "package": "com.louislam09.dictionary",
     },
     "web": {
       "bundler": "metro",
@@ -47,6 +48,18 @@
         "expo-updates",
         {
           "username": "louislam09"
+        }
+      ],
+      "expo-asset",
+      "expo-font",
+      "expo-web-browser",
+      [
+        "react-native-edge-to-edge",
+        {
+          "android": {
+            "parentTheme": "Default",
+            "enforceNavigationBarContrast": false
+          }
         }
       ]
     ],

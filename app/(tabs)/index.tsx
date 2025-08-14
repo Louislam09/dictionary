@@ -17,17 +17,18 @@ import { TFavoriteItem } from "@/types";
 import speakWord from "@/utils/speak";
 import { FlashList } from "@shopify/flash-list";
 import { router, useNavigation } from "expo-router";
-import { TabBarIcon } from "./_layout";
+import { MyColors } from "@/constants/themeColors";
+import MyIcon from "@/components/MyIcon";
+import { icons } from "lucide-react-native";
 
 interface IActionItem {
-  iconName: any;
+  iconName: keyof typeof icons;
   action?: any;
 }
 
 export default function SearchPage() {
   const { theme, themeScheme } = useCustomTheme();
-  const isDark = themeScheme === "dark";
-  const styles = getStyles(theme, isDark);
+  const styles = getStyles(theme);
   const navigation = useNavigation<any>();
   const { historyWords, dailyWord, addOrRemoveFavorite } =
     useDictionaryContext();
@@ -40,15 +41,15 @@ export default function SearchPage() {
 
   const wordOfDayActions: IActionItem[] = [
     {
-      iconName: "volume-up",
+      iconName: "Volume2",
       action: () => speakWord(dailyWord || ""),
     },
     {
-      iconName: "heart-o",
+      iconName: "Heart",
       action: () => addOrRemoveFavorite?.(defaultWord),
     },
     {
-      iconName: "search",
+      iconName: "Search",
       action: () => goToDefinition(dailyWord || ""),
     },
   ];
@@ -61,25 +62,24 @@ export default function SearchPage() {
         style={[
           styles.listItem,
           styles.historyItem,
-          ,
-          isDark && { borderColor: theme.text },
         ]}
         onPress={() => goToDefinition(item.topic)}
       >
         <Text
-          style={[styles.listHistoryLabel, isDark && { color: theme.text }]}
+          style={[styles.listHistoryLabel]}
         >
           {item?.topic}
           {"\n"}
-          <Text style={[styles.itemDate, isDark && { color: theme.text }]}>
+          <Text style={[styles.itemDate]}>
             {new Date(item.created_at).toLocaleString()}
           </Text>
         </Text>
         <TouchableOpacity onPress={() => addOrRemoveFavorite?.(item)}>
-          <TabBarIcon
+          <MyIcon
             size={26}
-            name={`heart${item.isFavorite ? "" : "-o"}`}
-            color={isDark ? theme.text : theme.tint}
+            name={'Heart'}
+            fillColor={item.isFavorite ? theme.tint : ""}
+            color={item.isFavorite ? theme.tint : theme.textSecondary}
           />
         </TouchableOpacity>
       </TouchableOpacity>
@@ -91,7 +91,10 @@ export default function SearchPage() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, paddingTop: 30 }} key={themeScheme}>
+    <SafeAreaView
+      style={{ flex: 1, paddingTop: 30, backgroundColor: theme.background }}
+      key={themeScheme}
+    >
       <KeyboardAvoidingView
         keyboardVerticalOffset={-100}
         style={{ flex: 1 }}
@@ -104,7 +107,7 @@ export default function SearchPage() {
           <View style={[styles.content]}>
             <View style={styles.searchContainer}>
               <TouchableOpacity>
-                <TabBarIcon size={26} name="search" color={theme.text} />
+                <MyIcon size={26} name="Search" color={theme.text} />
               </TouchableOpacity>
               <TextInput
                 placeholder="Buscar aqui..."
@@ -116,7 +119,7 @@ export default function SearchPage() {
                 }}
               />
               {/* <TouchableOpacity>
-                <TabBarIcon size={26} name="microphone" color={theme.text} />
+                <MyIcon size={26} name="microphone" color={theme.text} />
               </TouchableOpacity> */}
             </View>
             <AdBanner />
@@ -124,6 +127,7 @@ export default function SearchPage() {
             <TouchableOpacity
               activeOpacity={0.9}
               style={styles.wordOfDayContainer}
+              onPress={() => goToDefinition(dailyWord || "")}
             >
               <View style={styles.wordOfDayBody}>
                 <Text style={styles.bodyTitle}>{dailyWord}</Text>
@@ -131,25 +135,24 @@ export default function SearchPage() {
               <View style={styles.wordOfDayAction}>
                 {wordOfDayActions.map((item, index) => (
                   <TouchableOpacity key={index} onPress={item?.action}>
-                    <TabBarIcon
-                      iconStyle={styles.actionIcon}
+                    <MyIcon
                       size={26}
                       name={item.iconName}
-                      color={theme.background}
+                      color={theme.text}
                     />
                   </TouchableOpacity>
                 ))}
               </View>
             </TouchableOpacity>
+
             <Text style={styles.sectionTitle}>Historial 📃</Text>
             <View style={[styles.historyContainer]}>
               <FlashList
                 data={historyWords}
                 renderItem={renderHistoryItem}
-                estimatedItemSize={10}
                 key={themeScheme}
                 contentContainerStyle={{
-                  paddingRight: 15,
+                  paddingRight: 10,
                   backgroundColor: theme.background,
                 }}
                 ListEmptyComponent={
@@ -171,10 +174,10 @@ export default function SearchPage() {
                     <Text style={[styles.noResultsText]}>
                       ¡Haz clic en el buscador para empezar!
                     </Text>
-                    <TabBarIcon
-                      iconStyle={styles.actionIcon}
+                    <MyIcon
+                      // iconStyle={styles.actionIcon}
                       size={26}
-                      name="history"
+                      name="History"
                       color={theme.background}
                     />
                   </View>
@@ -188,7 +191,7 @@ export default function SearchPage() {
   );
 }
 
-const getStyles = (colors: typeof Colors.light, isDark?: boolean) =>
+const getStyles = (colors: MyColors) =>
   StyleSheet.create({
     noResultsContainer: {
       flex: 1,
@@ -207,6 +210,7 @@ const getStyles = (colors: typeof Colors.light, isDark?: boolean) =>
     },
     container: {
       flex: 1,
+      backgroundColor: "transparent",
     },
     titleContainer: {
       width: "100%",
@@ -218,7 +222,7 @@ const getStyles = (colors: typeof Colors.light, isDark?: boolean) =>
     title: {
       fontSize: 28,
       fontWeight: "bold",
-      color: "white",
+      color: colors.text,
     },
     content: {
       width: "100%",
@@ -242,7 +246,7 @@ const getStyles = (colors: typeof Colors.light, isDark?: boolean) =>
       paddingVertical: 10,
       justifyContent: "space-between",
       elevation: 5,
-      borderColor: colors.text,
+      borderColor: colors.textSecondary + 90,
       borderWidth: 1,
       backgroundColor: colors.background,
     },
@@ -283,7 +287,7 @@ const getStyles = (colors: typeof Colors.light, isDark?: boolean) =>
     sectionTitle: {
       color: colors.text,
       alignSelf: "flex-start",
-      marginVertical: 15,
+      marginBottom: 15,
       marginTop: 20,
       fontSize: 20,
       fontWeight: "bold",
@@ -295,22 +299,23 @@ const getStyles = (colors: typeof Colors.light, isDark?: boolean) =>
       justifyContent: "space-between",
       paddingHorizontal: 20,
       paddingVertical: 5,
-      marginVertical: 10,
+      // marginVertical: 10,
       borderRadius: 5,
       elevation: 5,
-      borderColor: colors.secondary,
+      borderColor: colors.textSecondary + 90,
       borderWidth: 1,
     },
     wordOfDayBody: {
-      backgroundColor: colors.tint,
+      // backgroundColor: colors.tint,
+      backgroundColor: 'transparent',
       alignItems: "center",
       justifyContent: "flex-start",
       marginBottom: 10,
     },
     bodyTitle: {
-      color: isDark ? "white" : colors.background,
+      color: colors.text,
       fontSize: 35,
-      fontWeight: isDark ? "bold" : "normal",
+      fontWeight: "bold"
     },
     bodyText: {
       marginTop: -15,
@@ -319,7 +324,8 @@ const getStyles = (colors: typeof Colors.light, isDark?: boolean) =>
     },
     wordOfDayAction: {
       width: "100%",
-      backgroundColor: colors.tint,
+      // backgroundColor: colors.tint,
+      backgroundColor: 'transparent',
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
@@ -327,7 +333,7 @@ const getStyles = (colors: typeof Colors.light, isDark?: boolean) =>
       paddingHorizontal: 20,
     },
     actionIcon: {
-      color: isDark ? colors.text : colors.background,
+      color: colors.text,
     },
     popularWordsContainer: {
       height: 60,
@@ -337,7 +343,7 @@ const getStyles = (colors: typeof Colors.light, isDark?: boolean) =>
       minWidth: 100,
       flexDirection: "row",
       paddingHorizontal: 20,
-      borderColor: colors.secondary,
+      borderColor: colors.textSecondary + 90,
       borderWidth: 1,
       elevation: 7,
       alignItems: "center",
@@ -360,13 +366,16 @@ const getStyles = (colors: typeof Colors.light, isDark?: boolean) =>
       padding: 15,
       marginBottom: 10,
       elevation: 7,
-      backgroundColor: colors.background,
+      // backgroundColor: colors.background,
+      backgroundColor: colors.text + 20,
     },
     listHistoryLabel: {
       fontSize: 16,
-      fontWeight: "bold"
+      fontWeight: "bold",
+      color: colors.text
     },
     itemDate: {
       fontSize: 10,
+      color: colors.textSecondary
     },
   });

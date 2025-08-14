@@ -1,20 +1,18 @@
-import Colors from "@/constants/Colors";
-import getThemes from "@/constants/themeColors";
+import getThemes, { MyColors } from "@/constants/themeColors";
 import { EThemes } from "@/types";
 import React, {
   createContext,
-  useState,
-  useContext,
-  useEffect,
   ReactNode,
+  useContext,
+  useState
 } from "react";
-import { Appearance } from "react-native";
 import { useStorage } from "./LocalstoreContext";
 
 interface ThemeContextProps {
   themeScheme: "light" | "dark";
   toggleTheme: (schema?: "light" | "dark") => void;
-  theme: typeof Colors.dark;
+  theme: MyColors;
+  // theme: typeof Colors.dark;
   onChangeCurrentTheme: (currentTheme: keyof typeof EThemes) => void;
 }
 
@@ -26,10 +24,8 @@ interface ThemeProviderProps {
 
 const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const { storedData, isDataLoaded, saveData } = useStorage();
-  const colorScheme = Appearance.getColorScheme();
-  const [themeScheme, setTheme] = useState<"light" | "dark">(
-    colorScheme === "dark" ? "dark" : "light"
-  );
+  // const colorScheme = Appearance.getColorScheme();
+  const [themeScheme, setTheme] = useState<"light" | "dark">("dark");
   const [currentTheme, setCurrentTheme] =
     useState<keyof typeof EThemes>("BlackWhite");
 
@@ -39,21 +35,22 @@ const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     dark: DarkTheme,
     light: LightTheme,
   };
-  const theme = customTheme[themeScheme ?? "light"].colors;
+  // Default to dark
+  const theme = customTheme["dark"].colors;
 
-  useEffect(() => {
-    if (!isDataLoaded) return;
-    setCurrentTheme(storedData.currentTheme || "Blue");
-    storedData.isDarkMode && setTheme("dark");
+  // useEffect(() => {
+  //   if (!isDataLoaded) return;
+  //   setCurrentTheme(storedData.currentTheme || "Blue");
+  //   storedData.isDarkMode && setTheme("dark");
 
-    const subscription = Appearance.addChangeListener(({ colorScheme }) => {
-      setTheme(colorScheme === "dark" ? "dark" : "light");
-    });
+  //   const subscription = Appearance.addChangeListener(({ colorScheme }) => {
+  //     setTheme(colorScheme === "dark" ? "dark" : "light");
+  //   });
 
-    return () => {
-      subscription.remove();
-    };
-  }, [isDataLoaded]);
+  //   return () => {
+  //     subscription.remove();
+  //   };
+  // }, [isDataLoaded]);
 
   const onChangeCurrentTheme = (themeColor: keyof typeof EThemes) => {
     setCurrentTheme(themeColor);

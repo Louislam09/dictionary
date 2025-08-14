@@ -1,6 +1,6 @@
 import { useState, useEffect, Dispatch, SetStateAction } from "react";
-import * as SQLite from "expo-sqlite";
 import { SEARCH_Word_QUERY_NEW } from "@/constants/Queries";
+import { useDBContext } from "@/context/DatabaseContext";
 
 export interface UseSearchHookState {
   searchResults: any[] | null;
@@ -13,11 +13,8 @@ interface UseSearchHook {
   setSearchTerm: Dispatch<SetStateAction<string>>;
 }
 
-type UseSearch = {
-  db: SQLite.SQLiteDatabase | null | undefined;
-};
-
-const useSearch = ({ db }: UseSearch): UseSearchHook => {
+const useSearch = (): UseSearchHook => {
+  const { executeSql } = useDBContext();
   const [state, setState] = useState<UseSearchHookState>({
     searchResults: null,
     error: null,
@@ -27,42 +24,32 @@ const useSearch = ({ db }: UseSearch): UseSearchHook => {
     setState((prev) => ({ ...prev, searchResults: [], error: null }));
   };
 
-  const searchInDatabase = (
+  const searchInDatabase = async (
     query: string,
     abortController: AbortController
   ): Promise<any[]> => {
-    const word = query
+    const word = query;
 
-    return new Promise((resolve, reject) => {
-      if (!db) return true;
-
+    return new Promise(async (resolve, reject) => {
       abortController.signal.addEventListener("abort", () => {
         setState({ searchResults: null, error: "Search aborted" });
         reject(new Error(`Search aborted: ${query}`));
       });
 
-      const myQuery = SEARCH_Word_QUERY_NEW
-      db.transaction((tx) => {
-        tx.executeSql(
-          `${myQuery}`,
+      try {
+        const results = await executeSql(
+          SEARCH_Word_QUERY_NEW,
           [`%${word}%`],
-          (_, { rows }) => {
-            if (!abortController.signal.aborted) {
-              const results: any[] = [];
-              for (let i = 0; i < rows.length; i++) {
-                results.push(rows.item(i));
-              }
-              resolve(results);
-            }
-          },
-          (_, error) => {
-            if (!abortController.signal.aborted) {
-              reject(error);
-            }
-            return true;
-          }
+          "search"
         );
-      });
+        if (!abortController.signal.aborted) {
+          resolve(results);
+        }
+      } catch (error) {
+        if (!abortController.signal.aborted) {
+          reject(error);
+        }
+      }
     });
   };
 
@@ -74,7 +61,11 @@ const useSearch = ({ db }: UseSearch): UseSearchHook => {
       const results = await searchInDatabase(query, abortController);
       setState({ searchResults: results ?? [], error: null });
     } catch (error: any) {
-      setState({ searchResults: null, error });
+      console.error("Search error:", error);
+      setState({
+        searchResults: null,
+        error: error.message || "Search failed",
+      });
     }
   };
 

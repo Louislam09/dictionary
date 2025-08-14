@@ -13,18 +13,22 @@ import { useDictionaryContext } from "@/context/DictionaryContext";
 import { useCustomTheme } from "@/context/ThemeContext";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
-import { TabBarIcon } from "./_layout";
 import { FlashList } from "@shopify/flash-list";
 import { EThemes } from "@/types";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { useStorage } from "@/context/LocalstoreContext";
+import { MyColors } from "@/constants/themeColors";
+import { Stack } from "expo-router";
+import MyIcon from "@/components/MyIcon";
+import { icons } from "lucide-react-native";
 
 type TOption = {
   label: string;
   extraText?: string;
-  iconName: React.ComponentProps<
-    typeof FontAwesome | typeof FontAwesome5
-  >["name"];
+  iconName: keyof typeof icons;
+  //   iconName: React.ComponentProps<
+  //   typeof FontAwesome | typeof FontAwesome5
+  // >["name"];
   action: () => void;
   isFont5?: boolean;
 };
@@ -53,7 +57,7 @@ export default function SettingsPage() {
       [
         {
           text: "Cancelar",
-          onPress: () => {},
+          onPress: () => { },
           style: "destructive",
         },
         { text: "Borrar", onPress: () => deleteHistory?.() },
@@ -77,8 +81,9 @@ export default function SettingsPage() {
 
   const getColosTheme = useCallback(() => {
     return Object.values(EThemes).map((color, index) => ({
-      label: colorsKey[index],
-      iconName: color,
+      label: '',
+      // label: colorsKey[index],
+      iconName: color as any,
       action: () => {
         const currentTheme = colorsKey[index];
         saveData({ currentTheme });
@@ -89,30 +94,30 @@ export default function SettingsPage() {
   }, []);
 
   const sections: TSection[] = [
-    {
-      title: "General",
-      options: [
-        {
-          label: "Borrar Historial",
-          iconName: "trash",
-          action: warnBeforeDelete,
-          extraText: "Limpiar el historial de busqueda",
-        },
-      ],
-    },
-    {
-      title: "Configuración",
-      options: [
-        {
-          label: "Modo Claro / Modo Oscuro",
-          iconName: `${themeScheme === "dark" ? "sun" : "moon"}-o`,
-          action: () => {
-            toggleTheme();
-          },
-          extraText: "Cambiar entre el modo claro y el modo oscuro",
-        },
-      ],
-    },
+    // {
+    //   title: "General",
+    //   options: [
+    //     {
+    //       label: "Borrar Historial",
+    //       iconName: "trash",
+    //       action: warnBeforeDelete,
+    //       extraText: "Limpiar el historial de busqueda",
+    //     },
+    //   ],
+    // },
+    // {
+    //   title: "Configuración",
+    //   options: [
+    //     {
+    //       label: "Modo Claro / Modo Oscuro",
+    //       iconName: `${themeScheme === "dark" ? "sun" : "moon"}-o`,
+    //       action: () => {
+    //         toggleTheme();
+    //       },
+    //       extraText: "Cambiar entre el modo claro y el modo oscuro",
+    //     },
+    //   ],
+    // },
     {
       title: "Temas",
       id: "tema",
@@ -123,13 +128,13 @@ export default function SettingsPage() {
       options: [
         {
           label: "Santa Biblia RV60: Audio",
-          iconName: "book",
+          iconName: "BookOpenText",
           action: () => openAppInStore(URLS.BIBLE),
           extraText: "Descárgala y explora la Palabra de Dios.",
         },
         {
           label: "Mira Más Apps",
-          iconName: "google-play",
+          iconName: "Store",
           action: () => openAppInStore(URLS.MORE_APPS),
           isFont5: true,
           extraText: "Ver todas nuestras aplicaciones",
@@ -141,13 +146,13 @@ export default function SettingsPage() {
       options: [
         {
           label: "Contactame",
-          iconName: "envelope",
+          iconName: "Mail",
           action: () => sendEmail(URLS.ME),
           extraText: "Envíanos un correo electrónico",
         },
         {
           label: "Mira Más Apps",
-          iconName: "google-play",
+          iconName: "Store",
           action: () => openAppInStore(URLS.MORE_APPS),
           isFont5: true,
           extraText: "Ver todas nuestras aplicaciones",
@@ -160,8 +165,8 @@ export default function SettingsPage() {
     return (
       <TouchableOpacity
         onPress={item.action}
-        key={item + "+" + index}
-        style={[styles.listItem, { backgroundColor: item.iconName }]}
+        key={item.iconName + "+" + index}
+        style={[styles.themeOption, { backgroundColor: item.iconName }]}
       >
         <Text
           style={[styles.listItemLabel, { color: "white", fontWeight: "bold" }]}
@@ -172,24 +177,19 @@ export default function SettingsPage() {
     );
   };
 
-  const SettingSection = ({ title, options, id }: TSection, index: any) => {
+  const SettingSection = useCallback(({ title, options, id }: TSection, index: any) => {
     return (
       <View style={styles.sectionContainer} key={index}>
         <Text style={styles.sectionTitle}>{title}</Text>
         {id ? (
-          <View style={[styles.popularWordsContainer]}>
-            <FlashList
-              data={options}
-              renderItem={renderItem}
-              estimatedItemSize={50}
-              horizontal
-              contentContainerStyle={{
-                padding: 5,
-                paddingTop: 1,
-                paddingLeft: 1,
-                backgroundColor: theme.background,
-              }}
-            />
+          <View style={[styles.themeColorsContainer]}>
+            {options.map((option, index) => (
+              <TouchableOpacity
+                onPress={option.action}
+                key={option.iconName + "+" + index}
+                style={[styles.themeOption, { backgroundColor: option.iconName }]}
+              />
+            ))}
           </View>
         ) : (
           options.map((item, itemIndex) => (
@@ -208,7 +208,7 @@ export default function SettingsPage() {
                 {item.isFont5 ? (
                   <FontAwesome5 name="google-play" size={26} color={"green"} />
                 ) : (
-                  <TabBarIcon
+                  <MyIcon
                     size={26}
                     name={item.iconName}
                     color={theme.text}
@@ -220,7 +220,7 @@ export default function SettingsPage() {
         )}
       </View>
     );
-  };
+  }, [theme]);
 
   return (
     <View style={styles.container}>
@@ -235,38 +235,59 @@ export default function SettingsPage() {
   );
 }
 
-const getStyles = (colors: typeof Colors.light) =>
+const getStyles = (colors: MyColors) =>
   StyleSheet.create({
-    popularWordsContainer: {
-      height: 60,
-    },
-    listItemLabel: {
-      fontSize: 16,
-    },
     container: {
       flex: 1,
       alignItems: "center",
       justifyContent: "flex-start",
       backgroundColor: colors.background,
+      paddingHorizontal: 4,
+      // paddingTop: 40,
     },
     sectionContainer: {
       padding: 15,
       alignItems: "center",
       justifyContent: "flex-start",
-      backgroundColor: colors.background,
+      backgroundColor: 'transparent',
     },
     sectionTitle: {
       color: colors.text,
       alignSelf: "flex-start",
-      paddingLeft: 15,
+      // paddingLeft: 15,
       marginBottom: 10,
     },
+    themeColorsContainer: {
+      display: 'flex',
+      flexWrap: 'wrap',
+      flexDirection: 'row',
+      justifyContent: 'space-around',
+      width: '100%',
+      borderWidth: 1,
+      borderColor: colors.textSecondary + 50,
+      gap: 10,
+      alignItems: 'center',
+      padding: 10,
+      borderRadius: 5,
+      backgroundColor: colors.text + 20
+    },
+    themeOption: {
+      width: 58,
+      height: 60,
+      borderRadius: 5,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    listItemLabel: {
+      fontSize: 16,
+    },
+
     listItem: {
       flex: 1,
       minWidth: 100,
       flexDirection: "row",
       paddingHorizontal: 20,
-      borderColor: colors.text,
+      borderColor: colors.textSecondary + 50,
       borderWidth: 1,
       elevation: 7,
       alignItems: "center",
@@ -274,6 +295,7 @@ const getStyles = (colors: typeof Colors.light) =>
       gap: 10,
       marginHorizontal: 5,
       borderRadius: 5,
+      backgroundColor: colors.text + 20
     },
     historyContainer: {
       flex: 1,
@@ -286,8 +308,9 @@ const getStyles = (colors: typeof Colors.light) =>
       padding: 15,
       marginBottom: 10,
       elevation: 7,
-      backgroundColor: colors.background,
+      // backgroundColor: colors.background,
       maxHeight: 76,
+      backgroundColor: colors.text + 20
     },
     listHistoryLabel: {
       fontSize: 16,
@@ -296,6 +319,6 @@ const getStyles = (colors: typeof Colors.light) =>
     },
     itemDate: {
       fontSize: 12,
-      color: colors.text,
+      color: colors.textSecondary,
     },
   });

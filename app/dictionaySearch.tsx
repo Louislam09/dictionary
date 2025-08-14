@@ -9,6 +9,7 @@ import { useLocalSearchParams, useNavigation } from "expo-router";
 import { useDictionaryContext } from "@/context/DictionaryContext";
 import { TDictionaryData } from "@/types";
 import { useCustomTheme } from "@/context/ThemeContext";
+import DatabaseDebug from "@/components/DatabaseDebug";
 
 export default function SearchingPage() {
   const { theme } = useCustomTheme();
@@ -44,6 +45,7 @@ export default function SearchingPage() {
       ) : (
         <WordDefinition wordData={wordToSearch} />
       )}
+      {/* <DatabaseDebug /> */}
     </View>
   );
 }

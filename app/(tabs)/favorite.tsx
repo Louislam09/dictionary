@@ -11,7 +11,8 @@ import useInterstitialAdBanner from "@/hooks/useInterstitialAdBanner";
 import { TFavoriteItem } from "@/types";
 import { FlashList } from "@shopify/flash-list";
 import { useNavigation } from "expo-router";
-import { TabBarIcon } from "./_layout";
+import { MyColors } from "@/constants/themeColors";
+import MyIcon from "@/components/MyIcon";
 
 export default function FavoritePage() {
   const { theme, themeScheme } = useCustomTheme();
@@ -28,7 +29,7 @@ export default function FavoritePage() {
     navigation.navigate("dictionaySearch", { word: item.topic, isFav: true });
   };
 
-  const renderHistoryItem = ({
+  const renderFavItem = ({
     item,
     index,
   }: {
@@ -42,22 +43,21 @@ export default function FavoritePage() {
         style={[
           styles.listItem,
           styles.historyItem,
-          isDark && { borderColor: theme.text },
         ]}
       >
         <Text
-          style={[styles.listHistoryLabel, isDark && { color: theme.text }]}
+          style={[styles.listHistoryLabel]}
         >
           {item?.topic}
           {"\n"}
-          <Text style={[styles.itemDate, isDark && { color: theme.text }]}>
+          <Text style={[styles.itemDate]}>
             {new Date(item.created_at).toLocaleString()}
           </Text>
         </Text>
         <TouchableOpacity onPress={() => addOrRemoveFavorite?.(item.id)}>
-          <TabBarIcon
+          <MyIcon
             size={26}
-            name="heart"
+            name="Heart"
             color={isDark ? theme.text : theme.tint}
           />
         </TouchableOpacity>
@@ -72,8 +72,7 @@ export default function FavoritePage() {
         <FlashList
           key={themeScheme}
           data={favoriteWords}
-          renderItem={renderHistoryItem}
-          estimatedItemSize={10}
+          renderItem={renderFavItem}
           contentContainerStyle={{
             paddingRight: 15,
             backgroundColor: theme.background,
@@ -99,10 +98,11 @@ export default function FavoritePage() {
   );
 }
 
-const getStyles = (colors: typeof Colors.light, isDark?: boolean) =>
+const getStyles = (colors: MyColors) =>
   StyleSheet.create({
     itemDate: {
       fontSize: 10,
+      color: colors.textSecondary
     },
     noResultsContainer: {
       flex: 1,
@@ -127,7 +127,7 @@ const getStyles = (colors: typeof Colors.light, isDark?: boolean) =>
       minWidth: 100,
       flexDirection: "row",
       paddingHorizontal: 20,
-      borderColor: colors.text,
+      borderColor: colors.textSecondary + 90,
       borderWidth: 1,
       elevation: 7,
       alignItems: "center",
@@ -143,9 +143,9 @@ const getStyles = (colors: typeof Colors.light, isDark?: boolean) =>
       justifyContent: "space-between",
       padding: 15,
       marginBottom: 15,
-      backgroundColor: colors.background,
       elevation: 5,
       position: "relative",
+      backgroundColor: colors.text + 20,
     },
     listHistoryLabel: {
       fontSize: 16,

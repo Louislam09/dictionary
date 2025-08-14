@@ -8,9 +8,10 @@ import DatabaseProvider from "@/context/DatabaseContext";
 import DictionaryProvider from "@/context/DictionaryContext";
 import StorageProvider from "@/context/LocalstoreContext";
 import ThemeProvider from "@/context/ThemeContext";
-import { StatusBar } from "expo-status-bar";
+// import { StatusBar } from "expo-status-bar";
 import * as Updates from "expo-updates";
 import { ToastAndroid } from "react-native";
+import { SystemBars } from "react-native-edge-to-edge";
 import mobileAds, { MaxAdContentRating } from "react-native-google-mobile-ads";
 
 export { ErrorBoundary } from "expo-router";
@@ -33,11 +34,11 @@ export default function RootLayout() {
     mobileAds()
       .setRequestConfiguration({
         maxAdContentRating: MaxAdContentRating.G, // Only G-rated ads
-        tagForChildDirectedTreatment: true,       // COPPA compliance
-        tagForUnderAgeOfConsent: true,            // GDPR compliance
+        tagForChildDirectedTreatment: true, // COPPA compliance
+        tagForUnderAgeOfConsent: true, // GDPR compliance
       })
       .then(() => {
-        console.log("AdMob family-safe configuration set ✅");
+        // console.log("AdMob family-safe configuration set ✅");
         // Start loading ads SDK
         mobileAds().initialize();
       });
@@ -84,7 +85,8 @@ function RootLayoutNav() {
       <ThemeProvider>
         <DatabaseProvider>
           <DictionaryProvider>
-            <StatusBar style="auto" animated />
+            {/* <StatusBar style="auto" animated /> */}
+            <SystemBars style="auto" />
             <Stack>
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
               <Stack.Screen name="modal" options={{ presentation: "modal" }} />

@@ -78,7 +78,7 @@ const DictionaryProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const fetchHistoryWords = () => {
     if (!myDictionaryDB || !executeSql) return;
-    executeSql(myDictionaryDB, GET_HISTORY)
+    executeSql(GET_HISTORY)
       .then((res) => {
         const data = res as TFavoriteItem[];
         dispatch({ type: "SET_HISTORY_DATA", payload: data });
@@ -87,7 +87,7 @@ const DictionaryProvider: React.FC<{ children: React.ReactNode }> = ({
   };
   const fetchFavoriteWords = () => {
     if (!myDictionaryDB || !executeSql) return;
-    executeSql(myDictionaryDB, GET_FAVORITES)
+    executeSql(GET_FAVORITES)
       .then((res) => {
         const data = res as TFavoriteItem[];
         dispatch({ type: "SET_FAVORITE_DATA", payload: data });
@@ -97,21 +97,20 @@ const DictionaryProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const deleteHistory = async () => {
     if (!executeSql || !myDictionaryDB) return;
-    await executeSql(myDictionaryDB, DELETE_HISTORY_DATA, []);
+    await executeSql(DELETE_HISTORY_DATA, []);
     ToastAndroid.show("Historial Borrado!", ToastAndroid.SHORT);
     await fetchHistoryWords();
   };
 
   const fetchWord = async (word: string) => {
-    if (!executeSql || !myDictionaryDB) return;
-    const data = await executeSql(myDictionaryDB, GET_WORD, [word]);
+    const data = await executeSql(GET_WORD, [word]);
     return data;
   };
 
   const addWordToHistory = (word: string) => {
     if (!executeSql || !myDictionaryDB) return;
 
-    executeSql(myDictionaryDB, INSERT_HISTORY_WORD, [word, Date.now()])
+    executeSql(INSERT_HISTORY_WORD, [word, Date.now()])
       .then(async () => {
         await fetchHistoryWords();
       })
@@ -124,7 +123,7 @@ const DictionaryProvider: React.FC<{ children: React.ReactNode }> = ({
     const query = isID ? DELETE_FAVORITE_WORD : INSERT_FAVORITE_WORD;
     const params = isID ? [wordData] : [wordData.topic, Date.now()];
 
-    executeSql(myDictionaryDB, query, params)
+    executeSql(query, params)
       .then(async () => {
         await fetchFavoriteWords();
         await fetchHistoryWords();
