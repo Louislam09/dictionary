@@ -3,7 +3,7 @@
     "name": "Diccionario Español",
     "slug": "dictionary",
     "description": "Accede a un completo diccionario en español sin necesidad de conexión a internet. Amplía tu vocabulario en cualquier momento y lugar con nuestra aplicación fácil de usar y de navegación intuitiva.",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "default",
     "icon": "./assets/images/icon.png",
     "scheme": "dictionary-louislam09",
@@ -21,7 +21,7 @@
     },
     "android": {
       "edgeToEdgeEnabled": true,
-      "versionCode": 3,
+      "versionCode": 4,
       "icon": "./assets/images/icon.png",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
