@@ -1,4 +1,3 @@
-import { TabBarIcon } from "@/app/(tabs)/_layout";
 import Colors from "@/constants/Colors";
 import { htmlTemplate } from "@/constants/HtmlTemplate";
 import { useDictionaryContext } from "@/context/DictionaryContext";
@@ -11,6 +10,15 @@ import { StyleSheet, TouchableOpacity, View } from "react-native";
 import WebView from "react-native-webview";
 import { Text } from "./Themed";
 import { useCustomTheme } from "@/context/ThemeContext";
+import MyIcon from "./MyIcon";
+import { icons } from "lucide-react-native";
+
+interface IActionItem {
+  iconName: keyof typeof icons;
+  action?: any;
+  isFav?: boolean;
+}
+
 
 const WordDefinition = ({ wordData }: { wordData: TDictionaryData }) => {
   const { theme, themeScheme } = useCustomTheme();
@@ -27,7 +35,7 @@ const WordDefinition = ({ wordData }: { wordData: TDictionaryData }) => {
 
   const onMarkAsFavorite = () => {
     addOrRemoveFavorite?.(wordData as any);
-    setFav(true);
+    setFav(prev => !prev);
   };
 
   const copyContentToClipboard = () => {
@@ -42,19 +50,20 @@ const WordDefinition = ({ wordData }: { wordData: TDictionaryData }) => {
     `);
   };
 
-  const wordOfDayActions: any[] = useMemo(
+  const wordOfDayActions: IActionItem[] = useMemo(
     () => [
       {
-        iconName: "volume-up",
+        iconName: "Volume2",
         action: () => speakWord(wordData.topic),
       },
       {
-        iconName: `heart${fav ? "" : "-o"}`,
-        action: onMarkAsFavorite,
+        iconName: "Heart",
+        action: () => onMarkAsFavorite(),
+        isFav: fav
       },
       {
-        iconName: "copy",
-        action: copyContentToClipboard,
+        iconName: "Copy",
+        action: () => copyContentToClipboard(),
       },
     ],
     [fav]
@@ -70,11 +79,11 @@ const WordDefinition = ({ wordData }: { wordData: TDictionaryData }) => {
         <View style={styles.wordOfDayAction}>
           {wordOfDayActions.map((item, index) => (
             <TouchableOpacity key={index} onPress={item.action}>
-              <TabBarIcon
-                iconStyle={styles.actionIcon}
+              <MyIcon
                 size={26}
                 name={item.iconName}
-                color={theme.background}
+                color={theme.text}
+                fillColor={item.isFav ? theme.text : ""}
               />
             </TouchableOpacity>
           ))}

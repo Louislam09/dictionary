@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 import Animation from "./Animation";
 import { useCustomTheme } from "@/context/ThemeContext";
 import MyIcon from "./MyIcon";
+import { MyColors } from "@/constants/themeColors";
 
 export default function SearchingResult({ setWordToSearch }: any) {
   const { theme } = useCustomTheme();
@@ -81,7 +82,7 @@ export default function SearchingResult({ setWordToSearch }: any) {
           onFocus={() => { }}
         />
         {/* <TouchableOpacity>
-          <TabBarIcon size={26} name="microphone" color={theme.text} />
+          <MyIcon size={26} name="Mic" color={theme.text} />
         </TouchableOpacity> */}
       </View>
       <View style={[styles.historyContainer]}>
@@ -115,7 +116,7 @@ export default function SearchingResult({ setWordToSearch }: any) {
   );
 }
 
-const getStyles = (colors: typeof Colors.light) =>
+const getStyles = (colors: MyColors) =>
   StyleSheet.create({
     noResultsContainer: {
       flex: 1,

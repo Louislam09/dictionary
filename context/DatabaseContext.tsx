@@ -2,12 +2,14 @@ import * as SQLite from "expo-sqlite";
 import React, { createContext, useContext } from "react";
 import useDatabase from "../hooks/useDatabase";
 import { Text, View } from "@/components/Themed";
-import { ActivityIndicator } from "react-native";
+import { ActivityIndicator, Dimensions, Image } from "react-native";
 import useTheme from "@/hooks/useTheme";
+import Animation from "@/components/Animation";
 
 interface Row {
   [key: string]: any;
 }
+const { width } = Dimensions.get('window');
 
 type DatabaseContextType = {
   database?: SQLite.SQLiteDatabase | null;
@@ -45,8 +47,13 @@ const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   if (!isDatabaseReady || !database) {
-    return <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <ActivityIndicator color={theme.tint} size="large" />
+    return <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: theme.background }}>
+      <Animation
+        backgroundColor={"transparent"}
+        source={require('@/assets/lottie/loading-book.json')}
+        loop={true}
+      />
+      {/* <ActivityIndicator color={theme.tint} size="large" /> */}
       <Text>Cargando...</Text>
     </View>
   }

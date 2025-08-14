@@ -9,7 +9,7 @@
     "scheme": "dictionary-louislam09",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/images/splash.png",
+      "image": "./assets/images/splash-dark.png",
       "resizeMode": "contain",
       "backgroundColor": "#03131b"
     },
@@ -27,7 +27,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#000D16"
       },
-      "package": "com.louislam09.dictionary",
+      "package": "com.louislam09.dictionary"
     },
     "web": {
       "bundler": "metro",
@@ -59,6 +59,17 @@
           "android": {
             "parentTheme": "Default",
             "enforceNavigationBarContrast": false
+          }
+        }
+      ], 
+      [
+        "expo-splash-screen", 
+       {
+          "backgroundColor": "#000D16",
+          "image": "./assets/images/splash.png",
+          "dark": {
+            "image": "./assets/images/splash-dark.png",
+            "backgroundColor": "#000000"
           }
         }
       ]
