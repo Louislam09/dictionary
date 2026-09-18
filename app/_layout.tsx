@@ -4,8 +4,10 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 
+import AdSuppressionProvider from "@/context/AdSuppressionContext";
 import DatabaseProvider from "@/context/DatabaseContext";
 import DictionaryProvider from "@/context/DictionaryContext";
+import RewardedAdProvider from "@/context/RewardedAdContext";
 import StorageProvider from "@/context/LocalstoreContext";
 import ThemeProvider from "@/context/ThemeContext";
 // import { StatusBar } from "expo-status-bar";
@@ -82,22 +84,26 @@ export default function RootLayout() {
 function RootLayoutNav() {
   return (
     <StorageProvider>
-      <ThemeProvider>
-        <DatabaseProvider>
-          <DictionaryProvider>
-            {/* <StatusBar style="auto" animated /> */}
-            <SystemBars style="auto" />
-            <Stack>
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              <Stack.Screen name="modal" options={{ presentation: "modal" }} />
-              <Stack.Screen
-                name="dictionaySearch"
-                initialParams={{ word: null }}
-              />
-            </Stack>
-          </DictionaryProvider>
-        </DatabaseProvider>
-      </ThemeProvider>
+      <AdSuppressionProvider>
+        <RewardedAdProvider>
+          <ThemeProvider>
+            <DatabaseProvider>
+              <DictionaryProvider>
+                {/* <StatusBar style="auto" animated /> */}
+                <SystemBars style="auto" />
+                <Stack>
+                  <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                  <Stack.Screen name="modal" options={{ presentation: "modal" }} />
+                  <Stack.Screen
+                    name="dictionaySearch"
+                    initialParams={{ word: null }}
+                  />
+                </Stack>
+              </DictionaryProvider>
+            </DatabaseProvider>
+          </ThemeProvider>
+        </RewardedAdProvider>
+      </AdSuppressionProvider>
     </StorageProvider>
   );
 }

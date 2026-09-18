@@ -9,6 +9,7 @@ import {
 
 import AdBanner from "@/components/AdBanner";
 import Animation from "@/components/Animation";
+import RewardedAdFreeOffer from "@/components/RewardedAdFreeOffer";
 import { Text } from "@/components/Themed";
 import Colors from "@/constants/Colors";
 import { useDictionaryContext } from "@/context/DictionaryContext";
@@ -59,15 +60,10 @@ export default function SearchPage() {
       <TouchableOpacity
         activeOpacity={0.9}
         key={item.id + "-" + index}
-        style={[
-          styles.listItem,
-          styles.historyItem,
-        ]}
+        style={[styles.listItem, styles.historyItem]}
         onPress={() => goToDefinition(item.topic)}
       >
-        <Text
-          style={[styles.listHistoryLabel]}
-        >
+        <Text style={[styles.listHistoryLabel]}>
           {item?.topic}
           {"\n"}
           <Text style={[styles.itemDate]}>
@@ -77,7 +73,7 @@ export default function SearchPage() {
         <TouchableOpacity onPress={() => addOrRemoveFavorite?.(item)}>
           <MyIcon
             size={26}
-            name={'Heart'}
+            name={"Heart"}
             fillColor={item.isFavorite ? theme.tint : ""}
             color={item.isFavorite ? theme.tint : theme.textSecondary}
           />
@@ -122,7 +118,8 @@ export default function SearchPage() {
                 <MyIcon size={26} name="microphone" color={theme.text} />
               </TouchableOpacity> */}
             </View>
-            <AdBanner />
+            <AdBanner size="ANCHORED_ADAPTIVE_BANNER" />
+            <RewardedAdFreeOffer />
             <Text style={[styles.sectionTitle]}>Palabra Aleatoria ☀️</Text>
             <TouchableOpacity
               activeOpacity={0.9}
@@ -135,11 +132,7 @@ export default function SearchPage() {
               <View style={styles.wordOfDayAction}>
                 {wordOfDayActions.map((item, index) => (
                   <TouchableOpacity key={index} onPress={item?.action}>
-                    <MyIcon
-                      size={26}
-                      name={item.iconName}
-                      color={theme.text}
-                    />
+                    <MyIcon size={26} name={item.iconName} color={theme.text} />
                   </TouchableOpacity>
                 ))}
               </View>
@@ -307,7 +300,7 @@ const getStyles = (colors: MyColors) =>
     },
     wordOfDayBody: {
       // backgroundColor: colors.tint,
-      backgroundColor: 'transparent',
+      backgroundColor: "transparent",
       alignItems: "center",
       justifyContent: "flex-start",
       marginBottom: 10,
@@ -315,7 +308,7 @@ const getStyles = (colors: MyColors) =>
     bodyTitle: {
       color: colors.text,
       fontSize: 35,
-      fontWeight: "bold"
+      fontWeight: "bold",
     },
     bodyText: {
       marginTop: -15,
@@ -325,7 +318,7 @@ const getStyles = (colors: MyColors) =>
     wordOfDayAction: {
       width: "100%",
       // backgroundColor: colors.tint,
-      backgroundColor: 'transparent',
+      backgroundColor: "transparent",
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
@@ -372,10 +365,10 @@ const getStyles = (colors: MyColors) =>
     listHistoryLabel: {
       fontSize: 16,
       fontWeight: "bold",
-      color: colors.text
+      color: colors.text,
     },
     itemDate: {
       fontSize: 10,
-      color: colors.textSecondary
+      color: colors.textSecondary,
     },
   });

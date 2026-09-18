@@ -2,6 +2,7 @@ import { StyleSheet, TouchableOpacity } from "react-native";
 
 import AdBanner from "@/components/AdBanner";
 import Animation from "@/components/Animation";
+import RewardedAdFreeOffer from "@/components/RewardedAdFreeOffer";
 import { Text, View } from "@/components/Themed";
 import { MyColors } from "@/constants/themeColors";
 import { useDictionaryContext } from "@/context/DictionaryContext";
@@ -63,6 +64,7 @@ export default function HistoryPage() {
   return (
     <View style={styles.container}>
       <AdBanner size="ANCHORED_ADAPTIVE_BANNER" />
+      <RewardedAdFreeOffer />
       <View style={[styles.historyContainer]}>
         <FlashList
           key={themeScheme}

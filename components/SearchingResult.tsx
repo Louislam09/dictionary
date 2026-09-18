@@ -1,8 +1,9 @@
 import { StyleSheet, TextInput, TouchableOpacity } from "react-native";
 
 import { Text, View } from "@/components/Themed";
-import { showRandomAd } from "@/constants/ads";
+import { canShowInterstitial, recordInterstitialShown } from "@/constants/ads";
 import Colors from "@/constants/Colors";
+import { useAdSuppression } from "@/context/AdSuppressionContext";
 import { useDBContext } from "@/context/DatabaseContext";
 import { useDictionaryContext } from "@/context/DictionaryContext";
 import useInterstitialAdBanner from "@/hooks/useInterstitialAdBanner";
@@ -21,6 +22,7 @@ export default function SearchingResult({ setWordToSearch }: any) {
   const [query, setQuery] = useState("");
   const notFoundSource = require("../assets/lottie/search.json");
   const [searchWords, setSearchWords] = useState<any>([]);
+  const { isAdsSuppressed, hydrated } = useAdSuppression();
   const { interstitial, interstitialLoaded } = useInterstitialAdBanner();
 
   const { state: searchState, performSearch, setSearchTerm } = useSearch();
@@ -45,8 +47,15 @@ export default function SearchingResult({ setWordToSearch }: any) {
   }, [query]);
 
   const onItem = (word: any) => {
-    const shouldDisplayAd = showRandomAd();
-    if (shouldDisplayAd) interstitial.show();
+    if (
+      hydrated &&
+      !isAdsSuppressed &&
+      canShowInterstitial() &&
+      interstitialLoaded
+    ) {
+      interstitial.show();
+      recordInterstitialShown();
+    }
 
     setWordToSearch(word);
   };
@@ -86,7 +95,7 @@ export default function SearchingResult({ setWordToSearch }: any) {
         </TouchableOpacity> */}
       </View>
       <View style={[styles.historyContainer]}>
-        {query && !searchWords?.length ? (
+        {Boolean(query) && !searchWords?.length ? (
           <View style={styles.noResultsContainer}>
             <Animation
               backgroundColor={"transparent"}

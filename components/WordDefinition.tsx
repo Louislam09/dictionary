@@ -101,10 +101,25 @@ const WordDefinition = ({ wordData }: { wordData: TDictionaryData }) => {
           originWhitelist={["*"]}
           source={{ html: htmlTemplate(definition || "", theme, 18) }}
           scrollEnabled
+          renderLoading={() => <View
+            style={{
+              backgroundColor: theme.background,
+              flex: 1,
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              zIndex: 1000,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          />}
           onMessage={async (event) => {
             const text = `DEFINICIÓN DE ${event.nativeEvent.data}`;
             await Clipboard.setStringAsync(text);
           }}
+
         />
       </View>
     </>

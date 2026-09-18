@@ -8,11 +8,6 @@
     "icon": "./assets/images/icon.png",
     "scheme": "dictionary-louislam09",
     "userInterfaceStyle": "automatic",
-    "splash": {
-      "image": "./assets/images/splash-dark.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#03131b"
-    },
     "assetBundlePatterns": [
       "**/*"
     ],
@@ -20,14 +15,13 @@
       "supportsTablet": true
     },
     "android": {
-      "edgeToEdgeEnabled": true,
       "versionCode": 4,
       "icon": "./assets/images/icon.png",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#000D16"
       },
-      "package": "com.louislam09.dictionary"
+      "package": "com.louislam09.dictionary.dev"
     },
     "web": {
       "bundler": "metro",
@@ -40,6 +34,9 @@
         "expo-build-properties",
         {
           "android": {
+            "compileSdkVersion": 36,
+            "targetSdkVersion": 36,
+            "buildToolsVersion": "36.0.0",
             "enableProguardInReleaseBuilds": true
           }
         }

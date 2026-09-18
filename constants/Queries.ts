@@ -21,7 +21,7 @@ END AS isFavorite
 FROM dictionary d
 LEFT JOIN favorite_words fw 
 ON d.topic = fw.topic
-where d.topic = ?`;
+where lower(trim(d.topic)) = lower(trim(?)) limit 1`;
 
 const CREATE_FAVORITE_TABLE = `CREATE TABLE IF NOT EXISTS favorite_words (
   id INTEGER PRIMARY KEY AUTOINCREMENT,

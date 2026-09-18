@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { BackHandler, StyleSheet, TouchableOpacity } from "react-native";
 
 import SearchingResult from "@/components/SearchingResult";
 import { View } from "@/components/Themed";
@@ -10,6 +10,7 @@ import { useDictionaryContext } from "@/context/DictionaryContext";
 import { TDictionaryData } from "@/types";
 import { useCustomTheme } from "@/context/ThemeContext";
 import DatabaseDebug from "@/components/DatabaseDebug";
+import MyIcon from "@/components/MyIcon";
 
 export default function SearchingPage() {
   const { theme } = useCustomTheme();
@@ -20,22 +21,67 @@ export default function SearchingPage() {
   const { word } = useLocalSearchParams();
   const { fetchWord } = useDictionaryContext();
 
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
+
+  const handleBack = () => {
+    if (wordToSearch && !word) {
+      setWordToSearch(null);
+      return true;
+    }
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+      return true;
+    }
+    return false;
+  };
 
   useEffect(() => {
     navigation.setOptions({
       title: "Diccionario",
       headerStyle: { backgroundColor: theme.tint },
       headerTintColor: "white",
+      headerLeft: () => (
+        <TouchableOpacity
+          onPress={handleBack}
+          style={{ paddingRight: 15, paddingVertical: 5 }}
+          activeOpacity={0.7}
+        >
+          <MyIcon size={24} name="ArrowLeft" color="white" />
+        </TouchableOpacity>
+      ),
     });
-  }, [navigation]);
+  }, [navigation, theme, wordToSearch, word]);
 
   useEffect(() => {
-    if (!word) return;
+    const subscription = BackHandler.addEventListener(
+      "hardwareBackPress",
+      () => {
+        return handleBack();
+      }
+    );
+
+    return () => subscription.remove();
+  }, [wordToSearch, word, navigation]);
+
+  useEffect(() => {
+    if (!word) {
+      setWordToSearch(null);
+      return;
+    }
+    let isMounted = true;
     (async () => {
-      const [data] = (await fetchWord?.(word as string)) || [];
-      setWordToSearch(data as any);
+      try {
+        const [data] = (await fetchWord?.(word as string)) || [];
+        if (isMounted) {
+          setWordToSearch((data as any) || null);
+        }
+      } catch (e) {
+        if (isMounted) setWordToSearch(null);
+      }
     })();
+    return () => {
+      isMounted = false;
+    };
   }, [word]);
 
   return (

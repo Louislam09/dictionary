@@ -68,7 +68,7 @@ const DictionaryProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [state, dispatch] = useReducer(DictionaryReducer, initialContext);
-  const dailyWord = dailyWords[Math.floor(Math.random() * 100)];
+  const dailyWord = dailyWords[Math.floor(Math.random() * dailyWords.length)];
   const { database: myDictionaryDB, executeSql } = useDBContext();
 
   useEffect(() => {

@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { StyleSheet } from "react-native";
 import {
   AdEventType,
   InterstitialAd,
@@ -8,7 +7,7 @@ import {
 
 const GOOGLE_AD_ID =
   (process.env.EXPO_PUBLIC_GOOGLE_INTERSTITIAL_AD_ID as string) ||
-  TestIds.BANNER;
+  TestIds.INTERSTITIAL;
 const adUnitId = __DEV__ ? TestIds.INTERSTITIAL : GOOGLE_AD_ID;
 
 const interstitial = InterstitialAd.createForAdRequest(adUnitId, {
@@ -18,12 +17,10 @@ const interstitial = InterstitialAd.createForAdRequest(adUnitId, {
 const useInterstitialAdBanner = () => {
   const [interstitialLoaded, setInterstitialLoaded] = useState(false);
 
-  const loadInterstitial = () => {
+  useEffect(() => {
     const unsubscribeLoaded = interstitial.addAdEventListener(
       AdEventType.LOADED,
-      () => {
-        setInterstitialLoaded(true);
-      }
+      () => setInterstitialLoaded(true)
     );
 
     const unsubscribeClosed = interstitial.addAdEventListener(
@@ -33,35 +30,27 @@ const useInterstitialAdBanner = () => {
         interstitial.load();
       }
     );
+
+    const unsubscribeError = interstitial.addAdEventListener(
+      AdEventType.ERROR,
+      () => {
+        setInterstitialLoaded(false);
+      }
+    );
+
     interstitial.load();
 
     return () => {
-      unsubscribeClosed();
       unsubscribeLoaded();
+      unsubscribeClosed();
+      unsubscribeError();
     };
-  };
-
-  useEffect(() => {
-    const unsubscribeInterstitialEvents = loadInterstitial();
-
-    return () => {
-      unsubscribeInterstitialEvents();
-    };
-  }, [interstitialLoaded]);
+  }, []);
 
   return {
     interstitialLoaded,
     interstitial,
   };
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
 
 export default useInterstitialAdBanner;

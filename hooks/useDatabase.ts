@@ -57,171 +57,135 @@ function useDatabase(): UseDatabase {
         throw new Error("Database is not ready");
       }
 
-      const statement = await database.prepareAsync(sql);
-      try {
-        const result = await statement.executeAsync(params);
-        const endTime = Date.now();
-        const executionTime = endTime - startTime;
+      const isSelect = /^\s*(SELECT|PRAGMA|EXPLAIN)/i.test(sql);
+      let response: any[];
 
-        const response = await result.getAllAsync();
-        if (queryName) {
-          console.log(`Query ${queryName} executed in ${executionTime} ms.`);
-        }
-        return response as Row[];
-      } finally {
-        await statement.finalizeAsync();
+      if (isSelect) {
+        response = await database.getAllAsync(sql, params);
+      } else {
+        const result = await database.runAsync(sql, params);
+        response = [result];
       }
+
+      const endTime = Date.now();
+      const executionTime = endTime - startTime;
+      if (queryName) {
+        console.log(`Query ${queryName} executed in ${executionTime} ms.`);
+      }
+      return (response || []) as Row[];
     } catch (error) {
       console.error(`Error executing SQL "${sql}":`, error);
-      throw error; // Re-throw the error instead of returning empty array
+      throw error;
     }
   };
 
   async function createTables(db: SQLite.SQLiteDatabase) {
     const tables = [CREATE_FAVORITE_TABLE, CREATE_HISTORY_TABLE];
-
-    try {
-      for (const sql of tables) {
-        await db.execAsync(sql);
-      }
-    } catch (error) {
-      console.error("Error creating tables:", error);
-      throw error; // Rethrow to handle in the calling function
+    for (const sql of tables) {
+      await db.execAsync(sql);
     }
   }
 
   async function validateDatabase(db: SQLite.SQLiteDatabase) {
-    try {
-      // Check if the main dictionary table exists
-      const result = await db.getAllAsync(
-        "SELECT name FROM sqlite_master WHERE type='table' AND name='dictionary'"
-      );
+    const result = await db.getAllAsync(
+      "SELECT name FROM sqlite_master WHERE type='table' AND name='dictionary'"
+    );
 
-      if (result.length === 0) {
-        throw new Error("Dictionary table not found in database");
-      }
-
-      // Test a simple query on the dictionary table
-      // const testResult = await db.getAllAsync(
-      //   "SELECT COUNT(*) as count FROM dictionary LIMIT 1"
-      // );
-      // const count = (testResult[0] as any)?.count || 0;
-      // console.log(`Dictionary table contains ${count} records`);
-
-      return true;
-    } catch (error) {
-      console.error("Database validation failed:", error);
-      throw error;
+    if (!result || result.length === 0) {
+      throw new Error("Dictionary table not found in database");
     }
+
+    return true;
   }
 
   useEffect(() => {
-    async function openDatabase(databaseName: string) {
+    let isMounted = true;
+
+    async function copyAssetDatabase(localURI: string) {
+      let asset = Asset.fromModule(require("../assets/db/dictionary.db"));
+      if (!asset.downloaded) {
+        asset = await asset.downloadAsync();
+      }
+
+      const remoteURI = asset.localUri || asset.uri;
+      if (!remoteURI) {
+        throw new Error("Cannot locate dictionary database asset");
+      }
+
+      if (remoteURI.startsWith("http://") || remoteURI.startsWith("https://")) {
+        await FileSystem.downloadAsync(remoteURI, localURI);
+      } else {
+        await FileSystem.copyAsync({
+          from: remoteURI,
+          to: localURI,
+        });
+      }
+    }
+
+    async function initDatabase(databaseName: string) {
+      if (!isMounted) return;
       setIsDatabaseReady(false);
+
       const localFolder = FileSystem.documentDirectory + "SQLite";
       const dbName = databaseName;
       const localURI = localFolder + "/" + dbName;
 
-      if (!(await FileSystem.getInfoAsync(localFolder)).exists) {
-        await FileSystem.makeDirectoryAsync(localFolder);
+      const folderInfo = await FileSystem.getInfoAsync(localFolder);
+      if (!folderInfo.exists) {
+        await FileSystem.makeDirectoryAsync(localFolder, { intermediates: true });
       }
 
-      // check if db file exists, if does return db
-      if ((await FileSystem.getInfoAsync(localURI)).exists) {
-        const db = await SQLite.openDatabaseAsync(dbName);
-        return db;
-      }
+      const fileInfo = await FileSystem.getInfoAsync(localURI);
+      const fileExistsAndNotEmpty =
+        fileInfo.exists &&
+        ("size" in fileInfo ? (fileInfo.size ?? 0) > 0 : true);
 
-      let asset = Asset.fromModule(require("../assets/db/dictionary.db"));
-      if (!asset.downloaded) {
-        await asset.downloadAsync().then((value) => {
-          asset = value;
-          console.log("asset downloadAsync - finished");
-        });
-
-        let remoteURI = asset.localUri;
-
-        if (!(await FileSystem.getInfoAsync(localURI)).exists) {
-          await FileSystem.copyAsync({
-            from: remoteURI as string,
-            to: localURI,
-          }).catch((error) => {
-            console.log("asset copyDatabase - finished with error: " + error);
-          });
+      if (!fileExistsAndNotEmpty) {
+        if (fileInfo.exists) {
+          await FileSystem.deleteAsync(localURI, { idempotent: true });
         }
-      } else {
-        // for iOS - Asset is downloaded on call Asset.fromModule(), just copy from cache to local file
-        if (
-          asset.localUri ||
-          asset.uri.startsWith("asset") ||
-          asset.uri.startsWith("file")
-        ) {
-          let remoteURI = asset.localUri || asset.uri;
-
-          if (!(await FileSystem.getInfoAsync(localURI)).exists) {
-            await FileSystem.copyAsync({
-              from: remoteURI,
-              to: localURI,
-            }).catch((error) => {
-              console.log("local copyDatabase - finished with error: " + error);
-            });
-          }
-        } else if (
-          asset.uri.startsWith("http") ||
-          asset.uri.startsWith("https")
-        ) {
-          let remoteURI = asset.uri;
-
-          if (!(await FileSystem.getInfoAsync(localURI)).exists) {
-            await FileSystem.downloadAsync(remoteURI, localURI).catch(
-              (error) => {
-                console.log(
-                  "local downloadAsync - finished with error: " + error
-                );
-              }
-            );
-          }
-        }
+        await copyAssetDatabase(localURI);
       }
 
-      const db = await SQLite.openDatabaseAsync(dbName);
-      return db;
+      let db = await SQLite.openDatabaseAsync(dbName);
+
+      try {
+        await validateDatabase(db);
+      } catch (valErr) {
+        console.warn("Database validation failed, attempting to recreate from asset...", valErr);
+        await db.closeAsync().catch(() => {});
+        await FileSystem.deleteAsync(localURI, { idempotent: true });
+        await copyAssetDatabase(localURI);
+        db = await SQLite.openDatabaseAsync(dbName);
+        await validateDatabase(db);
+      }
+
+      await createTables(db);
+
+      if (isMounted) {
+        setDatabase(db);
+        setIsDatabaseReady(true);
+        setError("");
+        console.log("DB is ready 🚀");
+      }
     }
 
-    openDatabase(DBName.DICTIONARY_SPANISH)
-      .then(async (resultDatabase: SQLite.SQLiteDatabase) => {
-        if (!resultDatabase) {
-          throw new Error("Failed to open database");
-        }
-
-        // Test database connection with a simple query
-        // try {
-        //   await resultDatabase.execAsync("SELECT 1");
-        //   console.log("Database connection test successful");
-        // } catch (testError) {
-        //   console.error("Database connection test failed:", testError);
-        //   throw new Error("Database connection test failed");
-        // }
-
-        // Validate database structure
-        await validateDatabase(resultDatabase);
-
-        await createTables(resultDatabase);
-        setDatabase(resultDatabase);
-        setIsDatabaseReady(true);
-        console.log("DB is ready 🚀");
-      })
-      .catch((error) => {
-        console.log("[Error] opening database:", error);
-        setError(`Error opening database: ${error.message}`);
+    initDatabase(DBName.DICTIONARY_SPANISH).catch((err) => {
+      console.error("[Error] opening database:", err);
+      if (isMounted) {
+        setError(`Error opening database: ${err.message}`);
+        setIsDatabaseReady(false);
         if (retryOpen > 0) {
-          setRetryOpen(retryOpen - 1);
+          setTimeout(() => {
+            if (isMounted) setRetryOpen((prev) => prev - 1);
+          }, 1000);
         }
-        // setIsDatabaseReady(false);
-      })
-      .finally(() => {
-        setIsDatabaseReady(true);
-      });
+      }
+    });
+
+    return () => {
+      isMounted = false;
+    };
   }, [retryOpen]);
 
   return { executeSql, database, isDatabaseReady, error };

@@ -2,9 +2,11 @@ import { StyleSheet, TouchableOpacity } from "react-native";
 
 import AdBanner from "@/components/AdBanner";
 import Animation from "@/components/Animation";
+import RewardedAdFreeOffer from "@/components/RewardedAdFreeOffer";
 import { Text, View } from "@/components/Themed";
-import { showRandomAd } from "@/constants/ads";
+import { canShowInterstitial, recordInterstitialShown } from "@/constants/ads";
 import Colors from "@/constants/Colors";
+import { useAdSuppression } from "@/context/AdSuppressionContext";
 import { useDictionaryContext } from "@/context/DictionaryContext";
 import { useCustomTheme } from "@/context/ThemeContext";
 import useInterstitialAdBanner from "@/hooks/useInterstitialAdBanner";
@@ -20,12 +22,20 @@ export default function FavoritePage() {
   const { favoriteWords, addOrRemoveFavorite } = useDictionaryContext();
   const notFoundSource = require("../../assets/lottie/addFavorite.json");
   const navigation = useNavigation<any>();
+  const { isAdsSuppressed, hydrated } = useAdSuppression();
   const { interstitial, interstitialLoaded } = useInterstitialAdBanner();
   const isDark = themeScheme === "dark";
 
   const goToDefinition = (item: TFavoriteItem) => {
-    const shouldDisplayAd = showRandomAd();
-    if (shouldDisplayAd) interstitial.show();
+    if (
+      hydrated &&
+      !isAdsSuppressed &&
+      canShowInterstitial() &&
+      interstitialLoaded
+    ) {
+      interstitial.show();
+      recordInterstitialShown();
+    }
     navigation.navigate("dictionaySearch", { word: item.topic, isFav: true });
   };
 
@@ -68,6 +78,7 @@ export default function FavoritePage() {
   return (
     <View style={styles.container}>
       <AdBanner size="ANCHORED_ADAPTIVE_BANNER" />
+      <RewardedAdFreeOffer />
       <View style={[styles.historyContainer]}>
         <FlashList
           key={themeScheme}
