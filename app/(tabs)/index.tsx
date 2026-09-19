@@ -1,8 +1,11 @@
 import {
+  BackHandler,
   KeyboardAvoidingView,
+  Platform,
   SafeAreaView,
   StyleSheet,
   TextInput,
+  ToastAndroid,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -17,10 +20,11 @@ import { useCustomTheme } from "@/context/ThemeContext";
 import { TFavoriteItem } from "@/types";
 import speakWord from "@/utils/speak";
 import { FlashList } from "@shopify/flash-list";
-import { router, useNavigation } from "expo-router";
+import { router, useFocusEffect, useNavigation } from "expo-router";
 import { MyColors } from "@/constants/themeColors";
 import MyIcon from "@/components/MyIcon";
 import { icons } from "lucide-react-native";
+import { useCallback, useRef } from "react";
 
 interface IActionItem {
   iconName: keyof typeof icons;
@@ -31,6 +35,31 @@ export default function SearchPage() {
   const { theme, themeScheme } = useCustomTheme();
   const styles = getStyles(theme);
   const navigation = useNavigation<any>();
+  const lastBackPressRef = useRef(0);
+
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = () => {
+        const now = Date.now();
+        if (now - lastBackPressRef.current < 2000) {
+          BackHandler.exitApp();
+          return true;
+        }
+        lastBackPressRef.current = now;
+        if (Platform.OS === "android") {
+          ToastAndroid.show("Presiona de nuevo para salir", ToastAndroid.SHORT);
+        }
+        return true;
+      };
+
+      const subscription = BackHandler.addEventListener(
+        "hardwareBackPress",
+        onBackPress
+      );
+
+      return () => subscription.remove();
+    }, [])
+  );
   const { historyWords, dailyWord, addOrRemoveFavorite } =
     useDictionaryContext();
   const notFoundSource = require("../../assets/lottie/history.json");

@@ -5,7 +5,7 @@ import { View } from "@/components/Themed";
 import Colors from "@/constants/Colors";
 import WordDefinition from "@/components/WordDefinition";
 import { useEffect, useState } from "react";
-import { useLocalSearchParams, useNavigation } from "expo-router";
+import { router, useLocalSearchParams, useNavigation } from "expo-router";
 import { useDictionaryContext } from "@/context/DictionaryContext";
 import { TDictionaryData } from "@/types";
 import { useCustomTheme } from "@/context/ThemeContext";
@@ -32,7 +32,8 @@ export default function SearchingPage() {
       navigation.goBack();
       return true;
     }
-    return false;
+    router.replace("/(tabs)");
+    return true;
   };
 
   useEffect(() => {
@@ -56,7 +57,8 @@ export default function SearchingPage() {
     const subscription = BackHandler.addEventListener(
       "hardwareBackPress",
       () => {
-        return handleBack();
+        handleBack();
+        return true;
       }
     );
 
