@@ -183,7 +183,7 @@ const getStyles = (colors: typeof Colors.light, isDark?: boolean) =>
       backgroundColor: "transparent",
     },
     decorationLine: {
-      ...StyleSheet.absoluteFillObject,
+      position: "absolute",
       width: "15%",
       height: 4,
       backgroundColor: colors.tint,
@@ -191,7 +191,7 @@ const getStyles = (colors: typeof Colors.light, isDark?: boolean) =>
       left: "3%",
     },
     sectionDecorationLine: {
-      ...StyleSheet.absoluteFillObject,
+      position: "absolute",
       width: "10%",
       height: 4,
       backgroundColor: colors.tint,

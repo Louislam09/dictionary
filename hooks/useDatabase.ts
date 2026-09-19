@@ -4,10 +4,10 @@ import {
 } from "@/constants/Queries";
 import { DBName } from "@/enums";
 import { Asset } from "expo-asset";
-import * as FileSystem from "expo-file-system";
+import * as FileSystem from "expo-file-system/legacy";
 import * as SQLite from "expo-sqlite";
 import { useEffect, useState } from "react";
-import { ToastAndroid } from "react-native";
+import { Platform, ToastAndroid } from "react-native";
 
 interface Row {
   [key: string]: any;
@@ -103,8 +103,12 @@ function useDatabase(): UseDatabase {
 
     async function copyAssetDatabase(localURI: string) {
       let asset = Asset.fromModule(require("../assets/db/dictionary.db"));
-      if (!asset.downloaded) {
-        asset = await asset.downloadAsync();
+      try {
+        if (!asset.downloaded) {
+          asset = await asset.downloadAsync();
+        }
+      } catch (assetErr) {
+        console.warn("asset.downloadAsync failed, attempting direct download...", assetErr);
       }
 
       const remoteURI = asset.localUri || asset.uri;
@@ -113,7 +117,17 @@ function useDatabase(): UseDatabase {
       }
 
       if (remoteURI.startsWith("http://") || remoteURI.startsWith("https://")) {
-        await FileSystem.downloadAsync(remoteURI, localURI);
+        try {
+          await FileSystem.downloadAsync(remoteURI, localURI);
+        } catch (netErr) {
+          if (Platform.OS === "android") {
+            const localhostURI = remoteURI.replace(/http:\/\/[^/:]+(:[0-9]+)?/, "http://10.0.2.2$1");
+            console.log("Retrying download via 10.0.2.2:", localhostURI);
+            await FileSystem.downloadAsync(localhostURI, localURI);
+          } else {
+            throw netErr;
+          }
+        }
       } else {
         await FileSystem.copyAsync({
           from: remoteURI,

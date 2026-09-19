@@ -1,12 +1,13 @@
 import { View, Platform, StyleSheet, Text, TouchableOpacity } from 'react-native';
-import { useLinkBuilder } from '@react-navigation/native';
-import { BottomTabBarProps } from '@react-navigation/bottom-tabs'
+import type { Tabs } from 'expo-router';
 import { MyColors } from '@/constants/themeColors';
 import { useCustomTheme } from '@/context/ThemeContext';
 import MyIcon from '@/components/MyIcon';
 import { icons } from 'lucide-react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import { useEffect } from 'react';
+
+type BottomTabBarProps = Parameters<NonNullable<React.ComponentProps<typeof Tabs>['tabBar']>>[0];
 
 // Tab configuration with icons
 const tabConfig: Record<string, { icon: keyof typeof icons; label: string }> = {
@@ -18,7 +19,6 @@ const tabConfig: Record<string, { icon: keyof typeof icons; label: string }> = {
 
 function MyTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
     const { theme: colors } = useCustomTheme();
-    const { buildHref } = useLinkBuilder();
     const styles = getStyles(colors);
 
     return (
